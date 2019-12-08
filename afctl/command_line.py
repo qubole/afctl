@@ -1,9 +1,10 @@
-from afctl.parsers import setup_parser
+from afctl.parsers import Parser
 import sys
 
 def main():
-    parser = setup_parser()
-    parser.parse_known_args()
+    parser = Parser.setup_parser()
+    args = parser.parse_args()
+    args.func(args)
 
 if __name__ == '__main__':
     sys.exit(main())

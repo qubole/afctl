@@ -18,8 +18,6 @@ class Parser():
         sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, plugins, hooks.")
         sub_parser.set_defaults(func=self.list)
         sub_parser.add_argument("type", choices=self.choices)
-        self.parser.add_argument("--easter_egg")
-        self.parser.set_defaults(func=self.easter)
         return self.parser
 
     def create_project(self, args):
@@ -59,24 +57,3 @@ class Parser():
             self.plugins = self.data['plugins'].split(' ')
         except:
             sys.exit(3)
-
-    def easter(self, args):
-        if vars(args)['easter_egg'] == "I love open source.":
-            print("""
-              __  __           _                 _ _   _       _                     
-             |  \/  |         | |               (_) | | |     | |                    
-             | \  / | __ _  __| | ___  __      ___| |_| |__   | |     _____   _____  
-             | |\/| |/ _` |/ _` |/ _ \ \ \ /\ / / | __| '_ \  | |    / _ \ \ / / _ \ 
-             | |  | | (_| | (_| |  __/  \ V  V /| | |_| | | | | |___| (_) \ V /  __/ 
-             |_|  |_|\__,_|\__,_|\___|   \_/\_/ |_|\__|_| |_| |______\___/ \_/ \___| 
-              ____           ____        _           _                               
-             |  _ \         / __ \      | |         | |                              
-             | |_) |_   _  | |  | |_   _| |__   ___ | | ___                          
-             |  _ <| | | | | |  | | | | | '_ \ / _ \| |/ _ \                         
-             | |_) | |_| | | |__| | |_| | |_) | (_) | |  __/                         
-             |____/ \__, |  \___\_\\__,_|_.__/ \___/|_|\___|                         
-                     __/ |                                                           
-                    |___/                                                  
-                    """)
-        else:
-            print("Try again :p")

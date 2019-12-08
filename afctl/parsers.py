@@ -2,14 +2,15 @@ import argparse
 import yaml
 import sys
 import os
+import itertools
 
 class Parser():
 
 
     def setup_parser(self):
-        parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
+        self.parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
         #parser.add_argument("-v", "--version", action="store_true")  #learn the standard way to add version to python package
-        new_parser = parser.add_subparsers()
+        new_parser = self.parser.add_subparsers()
         sub_parser = new_parser.add_parser("init", help="Create a boilerplate code for your airflow project")
         sub_parser.set_defaults(func=self.create_project)
         sub_parser.add_argument("-n", "--name", help="Name of your airflow project", required=True)
@@ -17,12 +18,29 @@ class Parser():
         sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, plugins, hooks.")
         sub_parser.set_defaults(func=self.list)
         sub_parser.add_argument("type", choices=self.choices)
-        parser.add_argument("--easter_egg")
-        parser.set_defaults(func=self.easter)
-        return parser
+        self.parser.add_argument("--easter_egg")
+        self.parser.set_defaults(func=self.easter)
+        return self.parser
 
     def create_project(self, args):
-        pass
+        pwd = os.getcwd()
+        main_dir = [os.path.join(pwd, args.name)]
+        sub_dirs = ['__init__.py',
+                    'command_line.py',
+                    'meta.yml',
+                    'parser.py',
+                    'requirements.txt',
+                    'setup.py',
+                    '.gitignore']
+
+        if os.path.exists(main_dir[0]):
+            self.parser.error("Project already exists.")
+
+        print("Initializing new project...")
+
+        os.mkdir(main_dir[0])
+        for dir1, dir2 in itertools.product(main_dir, sub_dirs):
+            os.system("touch {}".format(os.path.join(dir1,dir2)))
 
     def list(self, args):
         print("Available {} :".format(args.type))

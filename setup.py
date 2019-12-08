@@ -11,7 +11,7 @@ setup(
     author_email="TODO",
     description="Python commandline tool to make deployment of Airflow projects easier.",
     packages=find_packages(),
-    package_data={},
+    package_data={'afctl': ['meta.yml']},
     entry_points={
         'console_scripts': ['afctl=afctl.command_line:main'],
     },

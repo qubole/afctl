@@ -1,0 +1,11 @@
+operators:
+  op1
+  op2
+sensors:
+  sen1
+  sen2
+hooks:
+  hook1
+  hook2
+plugins:
+  qubole

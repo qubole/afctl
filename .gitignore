@@ -28,3 +28,4 @@ logs
 .project
 */bin/**
 .tox
+.DS_Store

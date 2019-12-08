@@ -2,8 +2,8 @@ import argparse
 import yaml
 import sys
 import os
-import itertools
 from afctl import __version__
+from afctl.utils import Utility
 
 class Parser():
 
@@ -24,22 +24,27 @@ class Parser():
     def create_project(self, args):
         pwd = os.getcwd()
         main_dir = [os.path.join(pwd, args.name)]
-        sub_dirs = ['__init__.py',
-                    'command_line.py',
-                    'meta.yml',
-                    'parser.py',
-                    'requirements.txt',
-                    'setup.py',
-                    '.gitignore']
+        sub_files = ['requirements.txt', 'setup.py', '.gitignore']
+        sub_dir = [args.name]
+        sub_dir_files = ['__init__.py', 'command_line.py', 'parser.py', 'meta.yml']
 
         if os.path.exists(main_dir[0]):
             self.parser.error("Project already exists.")
 
         print("Initializing new project...")
 
+        # Create parent dir
         os.mkdir(main_dir[0])
-        for dir1, dir2 in itertools.product(main_dir, sub_dirs):
-            os.system("touch {}".format(os.path.join(dir1,dir2)))
+
+        # Create sub files
+        Utility.create_files(main_dir, sub_files)
+
+        # Create sub dir
+        Utility.create_dirs(main_dir, sub_dir)
+
+        # Create sub dir files
+        package_dir = ["{}/{}".format(main_dir[0], args.name)]
+        Utility.create_files(package_dir, sub_dir_files)
 
         print("New project initialized successfully.")
 

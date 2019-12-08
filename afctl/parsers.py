@@ -3,13 +3,14 @@ import yaml
 import sys
 import os
 import itertools
+from afctl import __version__
 
 class Parser():
 
 
     def setup_parser(self):
         self.parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
-        #parser.add_argument("-v", "--version", action="store_true")  #learn the standard way to add version to python package
+        self.parser.add_argument("-v", "--version", action='version', version=__version__)
         new_parser = self.parser.add_subparsers()
         sub_parser = new_parser.add_parser("init", help="Create a boilerplate code for your airflow project")
         sub_parser.set_defaults(func=self.create_project)
@@ -39,6 +40,8 @@ class Parser():
         os.mkdir(main_dir[0])
         for dir1, dir2 in itertools.product(main_dir, sub_dirs):
             os.system("touch {}".format(os.path.join(dir1,dir2)))
+
+        print("New project initialized successfully.")
 
     def list(self, args):
         print("Available {} :".format(args.type))

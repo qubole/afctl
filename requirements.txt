@@ -1,1 +1,2 @@
 pyyaml==5.2
+versioneer==0.18

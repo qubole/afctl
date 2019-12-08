@@ -1,0 +1,6 @@
+include versioneer.py
+include afctl/_version.py
+include requirements.txt
+include README.md
+include setup.cfg
+include afctl/meta.yml

@@ -5,8 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name="afctl",
-    #version=versioneer.get_version(),
-    #cmdclass=versioneer.get_cmdclass(),
+    version="0.1",
     url="TODO",
     author="TODO",
     author_email="TODO",

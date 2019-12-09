@@ -9,21 +9,21 @@ class Parser():
 
     @classmethod
     def setup_parser(cls):
-        cls.read_meta()
+        cls._read_meta()
         cls.parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
         cls.parser.add_argument("-v", "--version", action='version', version=__version__)
         new_parser = cls.parser.add_subparsers()
         sub_parser = new_parser.add_parser("init", help="Create a boilerplate code for your airflow project")
-        sub_parser.set_defaults(func=cls.create_project)
+        sub_parser.set_defaults(func=cls._create_project)
         sub_parser.add_argument("-n", "--name", help="Name of your airflow project", required=True)
         sub_parser.add_argument("-p", "--plugin", help="Add plugin to your project", choices=cls.plugins, required=True)
         sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, plugins, hooks.")
-        sub_parser.set_defaults(func=cls.list)
+        sub_parser.set_defaults(func=cls._list)
         sub_parser.add_argument("type", choices=cls.choices)
         return cls.parser
 
     @classmethod
-    def create_project(cls, args):
+    def _create_project(cls, args):
         pwd = os.getcwd()
         main_dir = [os.path.join(pwd, args.name)]
         sub_files = ['requirements.txt', 'setup.py', '.gitignore']
@@ -51,13 +51,13 @@ class Parser():
         print("New project initialized successfully.")
 
     @classmethod
-    def list(cls, args):
+    def _list(cls, args):
         print("Available {} :".format(args.type))
         vals = eval("cls.{}".format(args.type))
         print('\n'.join(map(str, vals)))
 
     @classmethod
-    def read_meta(cls):
+    def _read_meta(cls):
         try:
             with open("{}/{}".format(os.path.dirname(os.path.abspath(__file__)), 'meta.yml')) as file:
                 cls.data = yaml.full_load(file)

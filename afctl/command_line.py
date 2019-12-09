@@ -4,7 +4,7 @@ from afctl.parsers import Parser
 import sys
 
 def main():
-    parser = Parser().setup_parser()
+    parser = Parser.setup_parser()
     args = parser.parse_args()
 
     if not any(vars(args).values()):

@@ -7,21 +7,23 @@ from afctl.utils import Utility
 
 class Parser():
 
-
-    def setup_parser(self):
-        self.parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
-        self.parser.add_argument("-v", "--version", action='version', version=__version__)
-        new_parser = self.parser.add_subparsers()
+    @classmethod
+    def setup_parser(cls):
+        cls.read_meta()
+        cls.parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
+        cls.parser.add_argument("-v", "--version", action='version', version=__version__)
+        new_parser = cls.parser.add_subparsers()
         sub_parser = new_parser.add_parser("init", help="Create a boilerplate code for your airflow project")
-        sub_parser.set_defaults(func=self.create_project)
+        sub_parser.set_defaults(func=cls.create_project)
         sub_parser.add_argument("-n", "--name", help="Name of your airflow project", required=True)
-        sub_parser.add_argument("-p", "--plugin", help="Add plugin to your project", choices=self.plugins, required=True)
+        sub_parser.add_argument("-p", "--plugin", help="Add plugin to your project", choices=cls.plugins, required=True)
         sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, plugins, hooks.")
-        sub_parser.set_defaults(func=self.list)
-        sub_parser.add_argument("type", choices=self.choices)
-        return self.parser
+        sub_parser.set_defaults(func=cls.list)
+        sub_parser.add_argument("type", choices=cls.choices)
+        return cls.parser
 
-    def create_project(self, args):
+    @classmethod
+    def create_project(cls, args):
         pwd = os.getcwd()
         main_dir = [os.path.join(pwd, args.name)]
         sub_files = ['requirements.txt', 'setup.py', '.gitignore']
@@ -29,7 +31,7 @@ class Parser():
         sub_dir_files = ['__init__.py', 'command_line.py', 'parser.py', 'meta.yml']
 
         if os.path.exists(main_dir[0]):
-            self.parser.error("Project already exists.")
+            cls.parser.error("Project already exists.")
 
         print("Initializing new project...")
 
@@ -48,20 +50,22 @@ class Parser():
 
         print("New project initialized successfully.")
 
-    def list(self, args):
+    @classmethod
+    def list(cls, args):
         print("Available {} :".format(args.type))
-        vals = eval("self.{}".format(args.type))
+        vals = eval("cls.{}".format(args.type))
         print('\n'.join(map(str, vals)))
 
-    def __init__(self):
+    @classmethod
+    def read_meta(cls):
         try:
             with open("{}/{}".format(os.path.dirname(os.path.abspath(__file__)), 'meta.yml')) as file:
-                self.data = yaml.full_load(file)
+                cls.data = yaml.full_load(file)
 
-            self.choices = [k for k in self.data]
-            self.operators = self.data['operators'].split(' ')
-            self.hooks = self.data['hooks'].split(' ')
-            self.sensors = self.data['sensors'].split(' ')
-            self.plugins = self.data['plugins'].split(' ')
+            cls.choices = [k for k in cls.data]
+            cls.operators = cls.data['operators'].split(' ')
+            cls.hooks = cls.data['hooks'].split(' ')
+            cls.sensors = cls.data['sensors'].split(' ')
+            cls.plugins = cls.data['plugins'].split(' ')
         except:
             sys.exit(3)

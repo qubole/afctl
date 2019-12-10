@@ -1,4 +1,5 @@
 import argparse
+import logging
 import yaml
 import sys
 import os
@@ -17,38 +18,33 @@ class Parser():
         sub_parser.set_defaults(func=cls.create_project)
         sub_parser.add_argument("-n", "--name", help="Name of your airflow project", required=True)
         sub_parser.add_argument("-p", "--plugin", help="Add plugin to your project", choices=cls.plugins, required=True)
-        sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, plugins, hooks.")
+        sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, plugins, hooks and projects.")
         sub_parser.set_defaults(func=cls.list)
         sub_parser.add_argument("type", choices=cls.choices)
         return cls.parser
 
     @classmethod
     def create_project(cls, args):
-        pwd = os.getcwd()
-        main_dir = [os.path.join(pwd, args.name)]
-        sub_files = ['requirements.txt', 'setup.py', '.gitignore']
-        sub_dir = [args.name]
-        sub_dir_files = ['__init__.py', 'command_line.py', 'parser.py', 'meta.yml']
+        try:
+            pwd = os.getcwd()
+            main_dir = [os.path.join(pwd, args.name)]
+            sub_files = ['__init__.py', 'meta.yml']
 
-        if os.path.exists(main_dir[0]):
-            cls.parser.error("Project already exists.")
+            if os.path.exists(main_dir[0]):
+                cls.parser.error("Project already exists.")
 
-        print("Initializing new project...")
+            print("Initializing new project...")
 
-        # Create parent dir
-        os.mkdir(main_dir[0])
+            # Create parent dir
+            os.mkdir(main_dir[0])
 
-        # Create sub files
-        Utility.create_files(main_dir, sub_files)
+            #create file
+            Utility.create_files(main_dir, sub_files)
 
-        # Create sub dir
-        Utility.create_dirs(main_dir, sub_dir)
+            print("New project initialized successfully.")
 
-        # Create sub dir files
-        package_dir = ["{}/{}".format(main_dir[0], args.name)]
-        Utility.create_files(package_dir, sub_dir_files)
-
-        print("New project initialized successfully.")
+        except Exception as e:
+            logging.exception("Error in  creating project.")
 
     @classmethod
     def list(cls, args):
@@ -63,9 +59,11 @@ class Parser():
                 cls.data = yaml.full_load(file)
 
             cls.choices = [k for k in cls.data]
-            cls.operators = cls.data['operators'].split(' ')
-            cls.hooks = cls.data['hooks'].split(' ')
-            cls.sensors = cls.data['sensors'].split(' ')
-            cls.plugins = cls.data['plugins'].split(' ')
-        except:
+            cls.operators = "" if cls.data['operators'] is None else cls.data['operators'].split(' ')
+            cls.hooks = "" if cls.data['hooks'] is None else cls.data['hooks'].split(' ')
+            cls.sensors = "" if cls.data['sensors'] is None else cls.data['sensors'].split(' ')
+            cls.plugins = "" if cls.data['plugins'] is None else cls.data['plugins'].split(' ')
+            cls.projects = "" if cls.data['projects'] is None else cls.data['projects'].split(' ')
+        except Exception as e:
+            logging.exception("Error in reading meta.yml")
             sys.exit(3)

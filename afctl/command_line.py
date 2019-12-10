@@ -16,4 +16,4 @@ if __name__ == '__main__':
     try:
         sys.exit(main())
     except Exception as e:
-        print(e.message)
+        print(e)

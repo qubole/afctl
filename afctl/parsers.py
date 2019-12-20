@@ -23,7 +23,6 @@ class Parser():
                 arg = dict(a.split('=') for a in arguments[1:])
                 sub_parser.add_argument(arguments[0], **arg)
 
-
         return cls.parser
 
 
@@ -35,7 +34,7 @@ class Parser():
             sub_files = ['__init__.py', 'afctl_project_meta.yml']
 
             if os.path.exists(main_dir[0]):
-                logging.error("Project already exists. Please delete entry under afctl_congfis.")
+                logging.error("Project already exists. Please delete entry under afctl_congfis after removing the project from current directory.")
                 cls.parser.error("Project name already exists.")
 
             print("Initializing new project...")
@@ -57,7 +56,6 @@ class Parser():
     @classmethod
     def list(cls, args):
         try:
-            import pdb; pdb.set_trace()
             print("Available {} :".format(args.type))
             logging.info("Available {} :".format(args.type))
             print('\n'.join(map(str, cls.read_meta()[args.type])))

@@ -11,19 +11,25 @@ class Parser():
 
     @classmethod
     def setup_parser(cls):
+        try:
+            cls.parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
+            cls.parser.add_argument("-v", "--version", action='version', version=__version__)
+            all_subparsers = cls.get_subparsers()
+            subparsers = cls.parser.add_subparsers()
+            for sp in all_subparsers:
+                sub_parser = subparsers.add_parser(sp['parser'], help=sp['help'])
+                sub_parser.set_defaults(func=sp['func'])
+                for arguments in sp['args']:
+                    arg = {}
+                    for ag in arguments[1:]:
+                        for k,v in ag.items():
+                            arg[k] = v
+                    sub_parser.add_argument(arguments[0], **arg)
 
-        cls.parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
-        cls.parser.add_argument("-v", "--version", action='version', version=__version__)
-        all_subparsers = cls.get_subparsers()
-        subparsers = cls.parser.add_subparsers()
-        for sp in all_subparsers:
-            sub_parser = subparsers.add_parser(sp['parser'], help=sp['help'])
-            sub_parser.set_defaults(func=sp['func'])
-            for arguments in sp['args']:
-                arg = dict(a.split('=') for a in arguments[1:])
-                sub_parser.add_argument(arguments[0], **arg)
+            return cls.parser
 
-        return cls.parser
+        except Exception as e:
+            raise AfctlParserException(e)
 
 
     @classmethod
@@ -34,7 +40,7 @@ class Parser():
             sub_files = ['__init__.py', 'afctl_project_meta.yml']
 
             if os.path.exists(main_dir[0]):
-                logging.error("Project already exists. Please delete entry under afctl_congfis after removing the project from current directory.")
+                logging.error("Project already exists. Please delete entry under afctl_congfis\ after removing the project from current directory.")
                 cls.parser.error("Project name already exists.")
 
             print("Initializing new project...")
@@ -57,9 +63,8 @@ class Parser():
     def list(cls, args):
         try:
             print("Available {} :".format(args.type))
-            logging.info("Available {} :".format(args.type))
+            logging.info("Printing list on the console.")
             print('\n'.join(map(str, cls.read_meta()[args.type])))
-            logging.info('\n'.join(map(str, cls.read_meta()[args.type])))
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -95,7 +100,7 @@ class Parser():
                 'parser': 'init',
                 'help': 'Create a new Airflow project.',
                 'args': [
-                    ['name', "help=Name of your airflow project"]
+                    ['name', {'help':'Name of your airflow project'}]
                 ]
             },
 
@@ -104,7 +109,7 @@ class Parser():
                 'parser': 'list',
                 'help': 'Get list of operators, sensors, connectors and  hooks.',
                 'args': [
-                    ['type', "choices=['operators', 'sensors', 'connectors', 'hooks']"]
+                    ['type', {'choices':['operators', 'sensors', 'connectors', 'hooks']}]
                 ]
             }
         )

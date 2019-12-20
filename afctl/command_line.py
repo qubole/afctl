@@ -16,7 +16,8 @@ def main():
         args.func(args)
 
     except AfctlParserException as e:
-        logging.error(e)
+        logging.exception(e)
+
 
 if __name__ == '__main__':
     try:

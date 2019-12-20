@@ -25,7 +25,6 @@ class Parser():
                         for k,v in ag.items():
                             arg[k] = v
                     sub_parser.add_argument(arguments[0], **arg)
-
             return cls.parser
 
         except Exception as e:
@@ -37,11 +36,15 @@ class Parser():
         try:
             pwd = os.getcwd()
             main_dir = [os.path.join(pwd, args.name)]
+            config_dir = '{}/afctl_config'.format(os.path.expanduser("~"))
             sub_files = ['__init__.py', 'afctl_project_meta.yml']
 
-            if os.path.exists(main_dir[0]):
-                logging.error("Project already exists. Please delete entry under afctl_congfis\ after removing the project from current directory.")
-                cls.parser.error("Project name already exists.")
+            if not os.path.exists(config_dir):
+                os.mkdir(config_dir)
+
+            if os.path.exists(main_dir[0]) or os.path.exists("{}/{}.yml".format(config_dir, args.name)):
+                logging.error("Project already exists. Please delete entry under afctl_congfis after removing the project from the current directory.")
+                cls.parser.error("Project already exists.")
 
             print("Initializing new project...")
             logging.info("Project initialization started.")
@@ -51,6 +54,9 @@ class Parser():
 
             #create file
             Utility.create_files(main_dir, sub_files)
+
+            #create config file
+            os.system("touch {}/{}.yml".format(config_dir, args.name))
 
             print("New project initialized successfully.")
             logging.info("Project created.")
@@ -70,9 +76,23 @@ class Parser():
             raise AfctlParserException(e)
 
 
+    @classmethod
+    def add_config(cls, args):
+        try:
+            file = '{}/afctl_config/{}.yml'.format(os.path.expanduser("~"), args.project)
+            if not os.path.exists(file):
+                cls.parser.error("Project configuration file does not exists in afctl_config")
+                logging.error("Project does not exists")
+
+            os.system("vi {}".format(file))
+            logging.info("Configuration added.")
+            print("Configuration added.")
+
+        except Exception as e:
+            raise AfctlParserException(e)
+
 ########################################################################################################################
-    # ALL THE METHODS DOWN HERE RETURN VALUES.
-    # PLEASE FOLLOW THE CONVENTION TO KEEP THE CODE MAINTAINABLE
+
 ########################################################################################################################
 
 
@@ -110,6 +130,15 @@ class Parser():
                 'help': 'Get list of operators, sensors, connectors and  hooks.',
                 'args': [
                     ['type', {'choices':['operators', 'sensors', 'connectors', 'hooks']}]
+                ]
+            },
+
+            {
+                'func': cls.add_config,
+                'parser': 'add_config',
+                'help': 'Add configurations for your connection.',
+                'args': [
+                    ['project', {'help':'Name of the project for which you want to add connection configurations.'}]
                 ]
             }
         )

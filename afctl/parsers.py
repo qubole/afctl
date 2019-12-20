@@ -5,37 +5,41 @@ import sys
 import os
 from afctl import __version__
 from afctl.utils import Utility
+from afctl.exceptions import AfctlParserException
 
 class Parser():
 
-
-
     @classmethod
     def setup_parser(cls):
-        cls.read_meta()
+
         cls.parser = argparse.ArgumentParser(description="A CLI tool to make deployment of airflow projects faster")
         cls.parser.add_argument("-v", "--version", action='version', version=__version__)
-        new_parser = cls.parser.add_subparsers()
-        sub_parser = new_parser.add_parser("init", help="Create a boilerplate code for your airflow project")
-        sub_parser.set_defaults(func=cls.create_project)
-        sub_parser.add_argument("-n", "--name", help="Name of your airflow project", required=True)
-        sub_parser.add_argument("-p", "--plugin", help="Add plugin to your project", choices=cls.plugins, required=True)
-        sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, connectors and  hooks.")
-        sub_parser.set_defaults(func=cls.list)
-        sub_parser.add_argument("type", choices=cls.choices)
+        all_subparsers = cls.get_subparsers()
+        subparsers = cls.parser.add_subparsers()
+        for sp in all_subparsers:
+            sub_parser = subparsers.add_parser(sp['parser'], help=sp['help'])
+            sub_parser.set_defaults(func=sp['func'])
+            for arguments in sp['args']:
+                arg = dict(a.split('=') for a in arguments[1:])
+                sub_parser.add_argument(arguments[0], **arg)
+
+
         return cls.parser
 
+
     @classmethod
-    def create_project(cls, args):
+    def init(cls, args):
         try:
             pwd = os.getcwd()
             main_dir = [os.path.join(pwd, args.name)]
-            sub_files = ['__init__.py', 'meta.yml']
+            sub_files = ['__init__.py', 'afctl_project_meta.yml']
 
             if os.path.exists(main_dir[0]):
-                cls.parser.error("Project already exists.")
+                logging.error("Project already exists. Please delete entry under afctl_congfis.")
+                cls.parser.error("Project name already exists.")
 
             print("Initializing new project...")
+            logging.info("Project initialization started.")
 
             # Create parent dir
             os.mkdir(main_dir[0])
@@ -44,27 +48,66 @@ class Parser():
             Utility.create_files(main_dir, sub_files)
 
             print("New project initialized successfully.")
+            logging.info("Project created.")
 
         except Exception as e:
-            logging.exception("Error in  creating project.")
+            raise AfctlParserException(e)
+
 
     @classmethod
     def list(cls, args):
-        print("Available {} :".format(args.type))
-        vals = eval("cls.{}".format(args.type))
-        print('\n'.join(map(str, vals)))
+        try:
+            import pdb; pdb.set_trace()
+            print("Available {} :".format(args.type))
+            logging.info("Available {} :".format(args.type))
+            print('\n'.join(map(str, cls.read_meta()[args.type])))
+            logging.info('\n'.join(map(str, cls.read_meta()[args.type])))
+
+        except Exception as e:
+            raise AfctlParserException(e)
+
+
+########################################################################################################################
+    # ALL THE METHODS DOWN HERE RETURN VALUES.
+    # PLEASE FOLLOW THE CONVENTION TO KEEP THE CODE MAINTAINABLE
+########################################################################################################################
+
 
     @classmethod
     def read_meta(cls):
         try:
             with open("{}/{}".format(os.path.dirname(os.path.abspath(__file__)), 'meta.yml')) as file:
-                cls.data = yaml.full_load(file)
+                data = yaml.full_load(file)
+            operators = "" if data['operators'] is None else data['operators'].split(' ')
+            hooks = "" if data['hooks'] is None else data['hooks'].split(' ')
+            sensors = "" if data['sensors'] is None else data['sensors'].split(' ')
+            plugins = "" if data['connectors'] is None else data['connectors'].split(' ')
 
-            cls.choices = [k for k in cls.data]
-            cls.operators = "" if cls.data['operators'] is None else cls.data['operators'].split(' ')
-            cls.hooks = "" if cls.data['hooks'] is None else cls.data['hooks'].split(' ')
-            cls.sensors = "" if cls.data['sensors'] is None else cls.data['sensors'].split(' ')
-            cls.plugins = "" if cls.data['connectors'] is None else cls.data['plugins'].split(' ')
+            return {'operators':operators, 'hooks':hooks, 'sensors':sensors, 'plugins':plugins}
+
         except Exception as e:
-            logging.exception("Error in reading meta.yml")
-            sys.exit(3)
+            raise AfctlParserException(e)
+
+
+    @classmethod
+    def get_subparsers(cls):
+        subparsers = (
+            {
+                'func': cls.init,
+                'parser': 'init',
+                'help': 'Create a new Airflow project.',
+                'args': [
+                    ['name', "help=Name of your airflow project"]
+                ]
+            },
+
+            {
+                'func': cls.list,
+                'parser': 'list',
+                'help': 'Get list of operators, sensors, connectors and  hooks.',
+                'args': [
+                    ['type', "choices=['operators', 'sensors', 'connectors', 'hooks']"]
+                ]
+            }
+        )
+        return subparsers

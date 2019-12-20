@@ -8,6 +8,8 @@ from afctl.utils import Utility
 
 class Parser():
 
+
+
     @classmethod
     def setup_parser(cls):
         cls.read_meta()
@@ -18,7 +20,7 @@ class Parser():
         sub_parser.set_defaults(func=cls.create_project)
         sub_parser.add_argument("-n", "--name", help="Name of your airflow project", required=True)
         sub_parser.add_argument("-p", "--plugin", help="Add plugin to your project", choices=cls.plugins, required=True)
-        sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, plugins, hooks and projects.")
+        sub_parser = new_parser.add_parser("list", help="Get list of operators, sensors, connectors and  hooks.")
         sub_parser.set_defaults(func=cls.list)
         sub_parser.add_argument("type", choices=cls.choices)
         return cls.parser
@@ -62,8 +64,7 @@ class Parser():
             cls.operators = "" if cls.data['operators'] is None else cls.data['operators'].split(' ')
             cls.hooks = "" if cls.data['hooks'] is None else cls.data['hooks'].split(' ')
             cls.sensors = "" if cls.data['sensors'] is None else cls.data['sensors'].split(' ')
-            cls.plugins = "" if cls.data['plugins'] is None else cls.data['plugins'].split(' ')
-            cls.projects = "" if cls.data['projects'] is None else cls.data['projects'].split(' ')
+            cls.plugins = "" if cls.data['connectors'] is None else cls.data['plugins'].split(' ')
         except Exception as e:
             logging.exception("Error in reading meta.yml")
             sys.exit(3)

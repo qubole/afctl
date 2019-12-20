@@ -7,6 +7,6 @@ sensors:
 hooks:
   hook1
   hook2
-plugins:
+connectors:
   qubole
-projects:
+

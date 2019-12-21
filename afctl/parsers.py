@@ -54,7 +54,8 @@ class Parser():
             os.mkdir(main_dir[0])
 
             #create file
-            Utility.create_files(main_dir, sub_files)
+            files = Utility.create_files(main_dir, sub_files)
+            os.system("echo 'project: {}' >> {}".format(args.name, files[sub_files[1]]))
 
             #create config file
             os.system("cat {}/plugins/connectors/connection_config.yml >> {}".format(os.path.dirname(os.path.abspath(__file__)), config_file))

@@ -6,6 +6,7 @@ import os
 from afctl import __version__
 from afctl.utils import Utility
 from afctl.exceptions import AfctlParserException
+import subprocess
 
 class Parser():
 
@@ -86,7 +87,8 @@ class Parser():
                 cls.parser.error("Project configuration file does not exists in afctl_config")
                 logging.error("Project does not exists")
 
-            os.system("vi {}".format(file))
+            cmd = os.environ.get('EDITOR', 'vi') + ' ' + file
+            subprocess.call(cmd, shell=True)
             logging.info("Configuration added.")
             print("Configuration added.")
 

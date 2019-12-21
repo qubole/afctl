@@ -37,12 +37,13 @@ class Parser():
             pwd = os.getcwd()
             main_dir = [os.path.join(pwd, args.name)]
             config_dir = '{}/afctl_config'.format(os.path.expanduser("~"))
+            config_file = "{}/{}.yml".format(config_dir, args.name)
             sub_files = ['__init__.py', 'afctl_project_meta.yml']
 
             if not os.path.exists(config_dir):
                 os.mkdir(config_dir)
 
-            if os.path.exists(main_dir[0]) or os.path.exists("{}/{}.yml".format(config_dir, args.name)):
+            if os.path.exists(main_dir[0]) or os.path.exists(config_file):
                 logging.error("Project already exists. Please delete entry under afctl_congfis after removing the project from the current directory.")
                 cls.parser.error("Project already exists.")
 
@@ -56,7 +57,7 @@ class Parser():
             Utility.create_files(main_dir, sub_files)
 
             #create config file
-            os.system("touch {}/{}.yml".format(config_dir, args.name))
+            os.system("cat {}/plugins/connectors/connection_config.yml >> {}".format(os.path.dirname(os.path.abspath(__file__)), config_file))
 
             print("New project initialized successfully.")
             logging.info("Project created.")
@@ -129,7 +130,7 @@ class Parser():
                 'parser': 'list',
                 'help': 'Get list of operators, sensors, connectors and  hooks.',
                 'args': [
-                    ['type', {'choices':['operators', 'sensors', 'connectors', 'hooks']}]
+                    ['type', {'choices':['operators', 'sensors', 'connectors', 'hooks'], 'help':'Choose from the options.'}]
                 ]
             },
 

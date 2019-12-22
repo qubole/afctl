@@ -51,14 +51,14 @@ class Parser():
             print("Initializing new project...")
             logging.info("Project initialization started.")
 
-            # Create parent dir
+            # STEP - 1: Create parent dir
             os.mkdir(main_dir[0])
 
-            #create file
+            # STEP - 2: create files
             files = Utility.create_files(main_dir, sub_files)
             os.system("echo 'project: {}' >> {}".format(args.name, files[sub_files[1]]))
 
-            #create config file
+            #STEP - 3: create config file
             os.system("cat {}/plugins/connectors/connection_config.yml >> {}".format(os.path.dirname(os.path.abspath(__file__)), config_file))
 
             print("New project initialized successfully.")

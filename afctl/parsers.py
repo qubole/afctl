@@ -1,3 +1,5 @@
+__author__ = 'Aaditya Sharma'
+
 import argparse
 import logging
 import os
@@ -5,6 +7,7 @@ from afctl import __version__
 from afctl.utils import Utility
 from afctl.exceptions import AfctlParserException
 import subprocess
+from afctl.plugins.deployments.qubole.deployment_config import QuboleDeploymentConfig
 
 class Parser():
 
@@ -65,7 +68,7 @@ class Parser():
             origin = subprocess.run(['git', '--git-dir={}/.git'.format(main_dir), 'config', '--get', 'remote.origin.url'], stdout=subprocess.PIPE)
             origin = origin.stdout.decode('utf-8')[:-1]
             if origin == '':
-                print("Git origin is not set for this repository. Run 'afctl config global -o {origin}'")
+                print("Git origin is not set for this repository. Run 'afctl config global -o <origin>'")
             else:
                 Utility.update_config(project_name, {'global':{'origin':origin}})
                 print("Setting origin as : {}".format(origin))
@@ -90,7 +93,22 @@ class Parser():
 
     @classmethod
     def config(cls, args):
-        pass
+        try:
+            if args.type == 'add':
+                pass
+
+            if args.type == 'update':
+                pass
+
+            if args.type == 'global':
+                origin = args.o
+                if args.o is None:
+                    origin = input("Git origin for deployment : ")
+
+                Utility.update_config('foo', {'global':{'origin':origin}})
+
+        except Exception as e:
+            raise AfctlParserException(e)
 
 ########################################################################################################################
 
@@ -124,23 +142,22 @@ class Parser():
                         '   update - update an existing config for your deployment.\n'+
                         '       Arguments:\n'+
                         '           -d : Deployment Type\n'+
-                        '            [ Qubole ]\n'+
-                        '               -n : name of connection\n'+
-                        '               -e : name of environment\n'+
-                        '               -c : cluster label\n'+
-                        '               -t : auth token\n'+
+                        '           -p : Project\n'+
+                                    QuboleDeploymentConfig.PARSER_USAGE+
                         '   global\n'+
                         '       Arguments:\n'+
-                        '       -o : Set git origin for deployment\n'
+                        '           -p : Project\n'+
+                        '           -o : Set git origin for deployment\n'
                         ,
                 'args': [
                     ['type', {'choices':['add', 'update', 'global']}],
-                    ['-d', {'choices': ['qubole']}],
+                    ['-d', {'choices': Utility.read_meta()['deployment']}],
                     ['-n'],
                     ['-e'],
                     ['-c'],
                     ['-t'],
-                    ['-o']
+                    ['-o'],
+                    ['-p']
                 ]
 
             }

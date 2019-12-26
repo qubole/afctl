@@ -8,3 +8,8 @@ class AfctlParserException(AfctlException):
     """
         Exceptions caused while parsing the commands.
     """
+
+class AfctlUtilsException(AfctlException):
+    """
+        Exceptions cause while running the utils.
+    """

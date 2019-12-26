@@ -1,21 +1,75 @@
 import os
 import itertools
 import subprocess
+import yaml
+from afctl.exceptions import AfctlUtilsException
 
 class Utility():
 
+    CONSTS = {
+        'config_dir':'{}/afctl_config'.format(os.path.expanduser("~"))
+    }
+
     @staticmethod
     def create_dirs(parent, child):
-        dirs = {}
-        for dir1, dir2 in itertools.product(parent, child):
-            os.mkdir(os.path.join(dir1, dir2))
-            dirs[dir2] = os.path.join(dir1, dir2)
-        return dirs
+        try:
+            dirs = {}
+            for dir1, dir2 in itertools.product(parent, child):
+                os.mkdir(os.path.join(dir1, dir2))
+                dirs[dir2] = os.path.join(dir1, dir2)
+            return dirs
+        except Exception as e:
+            raise AfctlUtilsException(e)
+
 
     @staticmethod
     def create_files(parent, child):
-        files = {}
-        for dir1, dir2 in itertools.product(parent, child):
-            subprocess.run(['touch', os.path.join(dir1, dir2)])
-            files[dir2] = os.path.join(dir1, dir2)
-        return files
+        try:
+            files = {}
+            for dir1, dir2 in itertools.product(parent, child):
+                subprocess.run(['touch', os.path.join(dir1, dir2)])
+                files[dir2] = os.path.join(dir1, dir2)
+            return files
+        except Exception as e:
+            raise AfctlUtilsException(e)
+
+
+    @staticmethod
+    def read_meta():
+        try:
+            with open("{}/{}".format(os.path.dirname(os.path.abspath(__file__)), 'meta.yml')) as file:
+                data = yaml.full_load(file)
+            operators = "" if data['operators'] is None else data['operators'].split(' ')
+            hooks = "" if data['hooks'] is None else data['hooks'].split(' ')
+            sensors = "" if data['sensors'] is None else data['sensors'].split(' ')
+            deployment = "" if data['deployment'] is None else data['deployment'].split(' ')
+
+            return {'operators':operators, 'hooks':hooks, 'sensors':sensors, 'deployment':deployment}
+
+        except Exception as e:
+            raise AfctlUtilsException(e)
+
+    @staticmethod
+    def update_config(file, config):
+        try:
+            path = "{}/{}.yml".format(Utility.CONSTS['config_dir'], file)
+            if not os.path.exists(path):
+                print("Project's config file does not exists")
+                raise Exception("Project's config file does not exists")
+
+            with open(path) as file:
+                crawler = yaml.full_load(file)
+            Utility.crawl_config(crawler, config)
+            with open(path, 'w') as file:
+                yaml.dump(crawler, file)
+
+        except Exception as e:
+            raise AfctlUtilsException(e)
+
+    @staticmethod
+    def crawl_config(crawler, config):
+        for k,v in config.items():
+            if isinstance(v, str):
+                crawler[k] = v
+            else:
+                Utility.crawl_config(crawler[k], v)

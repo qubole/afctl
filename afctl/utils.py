@@ -7,7 +7,8 @@ from afctl.exceptions import AfctlUtilsException
 class Utility():
 
     CONSTS = {
-        'config_dir':'{}/afctl_config'.format(os.path.expanduser("~"))
+        'config_dir': os.path.join(os.path.expanduser("~"), 'afctl_config'),
+        'project_meta': 'afctl_project_meta.yml'
     }
 
     @staticmethod
@@ -49,10 +50,16 @@ class Utility():
         except Exception as e:
             raise AfctlUtilsException(e)
 
+
+    @staticmethod
+    def project_config(file):
+        return "{}.yml".format(os.path.join(Utility.CONSTS['config_dir'], file))
+
+
     @staticmethod
     def update_config(file, config):
         try:
-            path = "{}/{}.yml".format(Utility.CONSTS['config_dir'], file)
+            path = Utility.project_config(file)
             if not os.path.exists(path):
                 print("Project's config file does not exists")
                 raise Exception("Project's config file does not exists")
@@ -66,10 +73,24 @@ class Utility():
         except Exception as e:
             raise AfctlUtilsException(e)
 
+
     @staticmethod
     def crawl_config(crawler, config):
-        for k,v in config.items():
-            if isinstance(v, str):
-                crawler[k] = v
-            else:
-                Utility.crawl_config(crawler[k], v)
+        try:
+            for k,v in config.items():
+                if isinstance(v, str):
+                    crawler[k] = v
+                else:
+                    Utility.crawl_config(crawler[k], v)
+        except Exception as e:
+            raise AfctlUtilsException(e)
+
+
+    @staticmethod
+    def find_project(pwd):
+        dirs = pwd.lstrip('/').split('/')
+        for i in range(len(dirs)+1):
+            path = '/'.join(dirs[:i])
+            if os.path.exists(os.path.join('/'+path, Utility.CONSTS['project_meta'])):
+                return dirs[i-1]
+        return None

@@ -16,7 +16,7 @@ class Parser():
             all_subparsers = cls.get_subparsers()
             subparsers = cls.parser.add_subparsers()
             for sp in all_subparsers:
-                sub_parser = subparsers.add_parser(sp['parser'], help=sp['help'])
+                sub_parser = subparsers.add_parser(sp['parser'], usage=sp['help'])
                 sub_parser.set_defaults(func=sp['func'])
                 for arguments in sp['args']:
                     arg = {}
@@ -88,6 +88,10 @@ class Parser():
         except Exception as e:
             raise AfctlParserException(e)
 
+    @classmethod
+    def config(cls, args):
+        pass
+
 ########################################################################################################################
 
     @classmethod
@@ -109,6 +113,39 @@ class Parser():
                 'args': [
                     ['type', {'choices':['operators', 'sensors', 'deployment', 'hooks'], 'help':'Choose from the options.'}]
                 ]
+            },
+
+            {
+                'func': cls.config,
+                'parser': 'config',
+                'help': 'Setup configs for your project. Read documentation for argument types.\n'+
+                        'TYPES:\n'+
+                        '   add - add a config for your deployment.\n'+
+                        '   update - update an existing config for your deployment.\n'+
+                        '       Arguments:\n'+
+                        '           -d : Deployment Type\n'+
+                        '            [ Qubole ]\n'+
+                        '               -n : name of connection\n'+
+                        '               -e : name of environment\n'+
+                        '               -c : cluster label\n'+
+                        '               -t : auth token\n'+
+                        '   global\n'+
+                        '       Arguments:\n'+
+                        '       -o : Set git origin for deployment\n'
+                        ,
+                'args': [
+                    ['type', {'choices':['add', 'update', 'global']}],
+                    ['-d', {'choices': ['qubole']}],
+                    ['-n'],
+                    ['-e'],
+                    ['-c'],
+                    ['-t'],
+                    ['-o']
+                ]
+
             }
+
         )
         return subparsers
+
+

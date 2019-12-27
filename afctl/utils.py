@@ -117,10 +117,13 @@ class Utility():
                 obj = obj[k]
 
             for k,v in configs.items():
+                if obj[ config_parents[-1]] is None:
+                    obj[ config_parents[-1]] = {}
                 obj[ config_parents[-1]][k] = v
 
             with open(path, 'w') as file:
                 yaml.dump(crawler, file, default_flow_style=False, sort_keys=False)
 
+            print("New configuration added successfully.")
         except Exception as e:
             raise AfctlUtilsException(e)

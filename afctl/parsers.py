@@ -103,7 +103,7 @@ class Parser():
                 logging.error("Invalid project.")
 
             # Setting global values.
-            if args.type is None:
+            if args.type == "global":
                 origin = args.o
                 if args.o is None:
                     origin = input("Git origin for deployment : ")
@@ -167,21 +167,20 @@ class Parser():
                 'help': 'Setup configs for your project. Read documentation for argument types.\n'+
                         'TYPES:\n'+
                         'Argument\n'+
-                        '-i: Prompt for input\n'+
                         '   add - add a config for your deployment.\n'+
                         '   update - update an existing config for your deployment.\n'+
                         '       Arguments:\n'+
                         '           -d : Deployment Type\n'+
                         '           -p : Project\n'+
                                     DeploymentConfig.CONFIG_DETAILS+
-                        '   If None is provided\n'+
+                        '   global\n'+
                         '       Arguments:\n'+
                         '           -p : Project\n'+
                         '           -o : Set git origin for deployment\n'+
                         '   show -  Show the config file on console'
                         ,
                 'args': [
-                    ['type'],
+                    ['type', {'choices':['add', 'update', 'show', 'global']}],
                     ['-d', {'choices': Utility.read_meta()['deployment']}],
                     ['-o'],
                     ['-p'],

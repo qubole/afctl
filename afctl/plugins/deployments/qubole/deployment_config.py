@@ -9,6 +9,8 @@ from afctl.plugins.deployments.base_deployment_config import BaseDeploymentConfi
 #       token:
 
 class QuboleDeploymentConfig(BaseDeploymentConfig):
+
+    # This is required to be displayed on the usage command. Please add the same to your deployment file.
     PARSER_USAGE = \
     '            [ Qubole ]\n'+\
     '               -n : name of connection\n'+\
@@ -20,14 +22,27 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
     def validate_configs(cls, args):
         config = {}
 
+        # No argument is provided. So we will ask for the input from the user.
         if args.e is None and args.c is None and args.t is None:
-            config['name'] = input("Enter name of connection : ") if args.n is None else args.n
+
+            # User could have provided the name of the connection.
+            name = input("Enter name of connection : ") if args.n is None else args.n
             config['env'] = input("Enter environment : ")
             config['cluster'] = input("Enter cluster label : ")
             config['token'] = input("Enter auth token : ")
 
-            return {'deployment':{'qubole':{config['name']:config}}}, False, ""
+            # If update return the entire path because we are not sure if he has updated everything or only some values.
+            if args.type == 'update':
+                return {'deployment':{'qubole':{name:config}}}, False, ""
+
+            # In add just append this to your parent.
+            if args.type == 'add':
+                return {name:config}, False, ""
+
+        # Some arguments are given by the user. So don't ask for input.
         else:
+
+            # Name of connection is compulsory in this flow.
             if  args.n is None:
                 return config, True, "Name of connection is required. Check usage."
 
@@ -40,7 +55,13 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             if args.t is not None:
                 config['token'] = args.t
 
+            # For adding a new connection you need to provide all the configs.
             if args.type == 'add' and (args.e is None or args.c is None or args.t is None):
                 return {}, True, "All flags are required to add a new config. Check usage."
 
-            return {'deployment':{'qubole':{args.n:config}}}, False, ""
+            if args.type == 'update':
+                return {'deployment':{'qubole':{args.n:config}}}, False, ""
+            if args.type == "add":
+                return {args.n:config}, False, ""
+
+        return {}, False, "Some error has occurred."

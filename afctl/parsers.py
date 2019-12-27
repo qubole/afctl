@@ -111,10 +111,8 @@ class Parser():
                 Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
                 logging.info("Global configs updated.")
 
-            elif args.type == 'add':
-                pass
-
-            elif args.type == 'update':
+            # If adding or updating configs.
+            elif args.type == 'add' or  args.type == 'update':
                 if args.d is None:
                     cls.parser.error("-d argument is required. Check usage.")
 
@@ -124,11 +122,16 @@ class Parser():
                 if flag:
                     cls.parser.error(msg)
                 else:
-                    Utility.update_config(config_file, configs)
+                    if args.type == 'update':
+                        Utility.update_config(config_file, configs)
+                    if args.type == 'add':
+                        Utility.add_configs(['deployment', args.d],config_file, configs)
 
+            # Showing configs
             elif args.type == 'show':
                 Utility.print_file(Utility.project_config(config_file))
 
+            # Unsupported argument type.
             else:
                 cls.parser.error("Unsupported command argument {}. See usage.".format(args.type))
 

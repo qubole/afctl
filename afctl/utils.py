@@ -99,3 +99,28 @@ class Utility():
             if os.path.exists(os.path.join('/'+path, Utility.CONSTS['project_meta'])):
                 return dirs[i-1]
         return None
+
+    @staticmethod
+    def add_configs(config_parents, config_file, configs):
+        try:
+            path = Utility.project_config(config_file)
+            if not os.path.exists(path):
+                print("Project's config file does not exists")
+                raise Exception("Project's config file does not exists")
+
+            with open(path) as file:
+                crawler = yaml.full_load(file)
+
+
+            obj = crawler
+            for k in config_parents[:-1]:
+                obj = obj[k]
+
+            for k,v in configs.items():
+                obj[ config_parents[-1]][k] = v
+
+            with open(path, 'w') as file:
+                yaml.dump(crawler, file, default_flow_style=False, sort_keys=False)
+
+        except Exception as e:
+            raise AfctlUtilsException(e)

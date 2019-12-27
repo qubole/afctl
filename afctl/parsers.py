@@ -40,7 +40,7 @@ class Parser():
             main_dir = pwd if args.name == '.' else os.path.join(pwd, args.name.lstrip('/').rstrip('/'))
             project_name = os.path.basename(main_dir)
             config_dir = Utility.CONSTS['config_dir']
-            config_file = "{}/{}.yml".format(config_dir, project_name)
+            config_file = Utility.project_config(project_name)
             sub_files = ['__init__.py', 'afctl_project_meta.yml']
 
             if not os.path.exists(config_dir):
@@ -62,7 +62,7 @@ class Parser():
             os.system("echo 'project: {}' >> {}".format(project_name, files[sub_files[1]]))
 
             #STEP - 3: create config file
-            os.system("cat {}/plugins/deployments/deployment_config.yml >> {}".format(os.path.dirname(os.path.abspath(__file__)), config_file))
+            os.system("cat {}/plugins/deployments/deployment_config.yml > {}".format(os.path.dirname(os.path.abspath(__file__)), config_file))
 
             #STEP - 4: Add git origin.
             origin = subprocess.run(['git', '--git-dir={}'.format(os.path.join(main_dir, '.git')), 'config', '--get', 'remote.origin.url'], stdout=subprocess.PIPE)

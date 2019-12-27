@@ -121,10 +121,10 @@ class Parser():
                 if args.o is None:
                     origin = input("Git origin for deployment : ")
 
-                Utility.update_config(config_file, {'global':{'origin':origin}})
+                Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
                 logging.info("Global configs updated.")
 
-            elif args.type == 'list':
+            elif args.type == 'show':
                 Utility.print_file(Utility.project_config(config_file))
 
         except Exception as e:
@@ -158,6 +158,8 @@ class Parser():
                 'parser': 'config',
                 'help': 'Setup configs for your project. Read documentation for argument types.\n'+
                         'TYPES:\n'+
+                        'Argument\n'+
+                        '-i: Prompt for input\n'+
                         '   add - add a config for your deployment.\n'+
                         '   update - update an existing config for your deployment.\n'+
                         '       Arguments:\n'+
@@ -170,12 +172,12 @@ class Parser():
                         '           -o : Set git origin for deployment\n'
                         ,
                 'args': [
-                    ['type', {'choices':['add', 'update', 'global', 'list']}],
+                    ['type', {'choices':['add', 'update', 'global', 'show']}],
                     ['-d', {'choices': Utility.read_meta()['deployment']}],
                     ['-o'],
                     ['-p'],
                     ['-n'],
-                    ['-f', {'action':'store_true'}],
+                    ['-i', {'action':'store_true'}],
                     ['-e'],
                     ['-c'],
                     ['-t']

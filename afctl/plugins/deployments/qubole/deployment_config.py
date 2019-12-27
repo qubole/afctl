@@ -20,11 +20,13 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
     def validate_configs(cls, args):
         config = {}
 
-        if args.f:
+        if args.i:
             config['name'] = input("Enter name of connection : ")
             config['env'] = input("Enter environment : ")
             config['cluster'] = input("Enter cluster label : ")
             config['token'] = input("Enter auth token : ")
+
+            return {'deployment':{'qubole':{config['name']:config}}}, False, ""
         else:
             if  args.n is None:
                 return config, True, "Name of connection is required. Check usage."
@@ -41,4 +43,4 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             if args.type == 'add' and (args.e is None or args.c is None or args.t is None):
                 return {}, True, "All flags are required to add a new config. Check usage."
 
-        return {'deployment':{'qubole':{args.n:config}}}, False, ""
+            return {'deployment':{'qubole':{args.n:config}}}, False, ""

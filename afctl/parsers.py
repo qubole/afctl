@@ -116,6 +116,9 @@ class Parser():
                 print("Global configs updated.")
                 logging.info("Global configs updated.")
 
+            if args.type == 'list':
+                Utility.print_file(Utility.project_config(config_file))
+
         except Exception as e:
             raise AfctlParserException(e)
 
@@ -159,7 +162,7 @@ class Parser():
                         '           -o : Set git origin for deployment\n'
                         ,
                 'args': [
-                    ['type', {'choices':['add', 'update', 'global']}],
+                    ['type', {'choices':['add', 'update', 'global', 'list']}],
                     ['-d', {'choices': Utility.read_meta()['deployment']}],
                     ['-o'],
                     ['-p'],

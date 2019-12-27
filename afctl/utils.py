@@ -57,6 +57,10 @@ class Utility():
 
 
     @staticmethod
+    def print_file(file):
+        subprocess.call(['cat', file])
+
+    @staticmethod
     def update_config(file, config):
         try:
             path = Utility.project_config(file)
@@ -68,7 +72,7 @@ class Utility():
                 crawler = yaml.full_load(file)
             Utility.crawl_config(crawler, config)
             with open(path, 'w') as file:
-                yaml.dump(crawler, file)
+                yaml.dump(crawler, file, default_flow_style=False, sort_keys=False)
 
         except Exception as e:
             raise AfctlUtilsException(e)

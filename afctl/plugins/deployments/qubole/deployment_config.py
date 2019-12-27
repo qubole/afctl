@@ -20,8 +20,8 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
     def validate_configs(cls, args):
         config = {}
 
-        if args.i:
-            config['name'] = input("Enter name of connection : ")
+        if args.e is None and args.c is None and args.t is None:
+            config['name'] = input("Enter name of connection : ") if args.n is None else args.n
             config['env'] = input("Enter environment : ")
             config['cluster'] = input("Enter cluster label : ")
             config['token'] = input("Enter auth token : ")

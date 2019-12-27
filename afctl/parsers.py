@@ -102,21 +102,8 @@ class Parser():
                 cls.parser.error("Invalid project.")
                 logging.error("Invalid project.")
 
-            elif args.type == 'add':
-                pass
-
-            elif args.type == 'update':
-                if args.d is None:
-                    cls.parser.error("-d argument is required. Check usage.")
-
-                configs, flag, msg = DeploymentConfig.validate_configs(args)
-
-                if flag:
-                    cls.parser.error(msg)
-                else:
-                    Utility.update_config(config_file, configs)
-
-            elif args.type == 'global':
+            # Setting global values.
+            if args.type is None:
                 origin = args.o
                 if args.o is None:
                     origin = input("Git origin for deployment : ")
@@ -124,8 +111,26 @@ class Parser():
                 Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
                 logging.info("Global configs updated.")
 
+            elif args.type == 'add':
+                pass
+
+            elif args.type == 'update':
+                if args.d is None:
+                    cls.parser.error("-d argument is required. Check usage.")
+
+                # Sanitize values.
+                configs, flag, msg = DeploymentConfig.validate_configs(args)
+
+                if flag:
+                    cls.parser.error(msg)
+                else:
+                    Utility.update_config(config_file, configs)
+
             elif args.type == 'show':
                 Utility.print_file(Utility.project_config(config_file))
+
+            else:
+                cls.parser.error("Unsupported command argument {}. See usage.".format(args.type))
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -166,18 +171,18 @@ class Parser():
                         '           -d : Deployment Type\n'+
                         '           -p : Project\n'+
                                     DeploymentConfig.CONFIG_DETAILS+
-                        '   global\n'+
+                        '   If None is provided\n'+
                         '       Arguments:\n'+
                         '           -p : Project\n'+
-                        '           -o : Set git origin for deployment\n'
+                        '           -o : Set git origin for deployment\n'+
+                        '   show -  Show the config file on console'
                         ,
                 'args': [
-                    ['type', {'choices':['add', 'update', 'global', 'show']}],
+                    ['type'],
                     ['-d', {'choices': Utility.read_meta()['deployment']}],
                     ['-o'],
                     ['-p'],
                     ['-n'],
-                    ['-i', {'action':'store_true'}],
                     ['-e'],
                     ['-c'],
                     ['-t']

@@ -7,7 +7,8 @@ from afctl import __version__
 from afctl.utils import Utility
 from afctl.exceptions import AfctlParserException
 import subprocess
-from afctl.plugins.deployments.qubole.deployment_config import QuboleDeploymentConfig
+from afctl.plugins.deployments.deployment_config import DeploymentConfig
+
 
 class Parser():
 
@@ -101,13 +102,18 @@ class Parser():
                 cls.parser.error("Invalid project.")
                 logging.error("Invalid project.")
 
-            if args.type == 'add':
+            elif args.type == 'add':
                 pass
 
-            if args.type == 'update':
-                pass
+            elif args.type == 'update':
+                configs, flag, msg = DeploymentConfig.validate_configs(args)
 
-            if args.type == 'global':
+                if flag:
+                    cls.parser.error(msg)
+                else:
+                    Utility.update_config(config_file, configs)
+
+            elif args.type == 'global':
                 origin = args.o
                 if args.o is None:
                     origin = input("Git origin for deployment : ")
@@ -116,7 +122,7 @@ class Parser():
                 print("Global configs updated.")
                 logging.info("Global configs updated.")
 
-            if args.type == 'list':
+            elif args.type == 'list':
                 Utility.print_file(Utility.project_config(config_file))
 
         except Exception as e:
@@ -155,7 +161,7 @@ class Parser():
                         '       Arguments:\n'+
                         '           -d : Deployment Type\n'+
                         '           -p : Project\n'+
-                                    QuboleDeploymentConfig.PARSER_USAGE+
+                                    DeploymentConfig.CONFIG_DETAILS+
                         '   global\n'+
                         '       Arguments:\n'+
                         '           -p : Project\n'+

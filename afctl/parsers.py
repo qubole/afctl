@@ -106,6 +106,9 @@ class Parser():
                 pass
 
             elif args.type == 'update':
+                if args.d is None:
+                    cls.parser.error("-d argument is required. Check usage.")
+
                 configs, flag, msg = DeploymentConfig.validate_configs(args)
 
                 if flag:
@@ -119,7 +122,6 @@ class Parser():
                     origin = input("Git origin for deployment : ")
 
                 Utility.update_config(config_file, {'global':{'origin':origin}})
-                print("Global configs updated.")
                 logging.info("Global configs updated.")
 
             elif args.type == 'list':
@@ -173,6 +175,7 @@ class Parser():
                     ['-o'],
                     ['-p'],
                     ['-n'],
+                    ['-f', {'action':'store_true'}],
                     ['-e'],
                     ['-c'],
                     ['-t']

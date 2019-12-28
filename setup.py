@@ -13,7 +13,6 @@ setup(
     author_email="TODO",
     description="Python commandline tool to make deployment of Airflow projects easier.",
     packages=find_packages(),
-    package_data={'':['meta.yml']},
     include_package_data=True,
     entry_points={
         'console_scripts': ['afctl=afctl.command_line:main'],

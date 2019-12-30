@@ -13,3 +13,8 @@ class AfctlUtilsException(AfctlException):
     """
         Exceptions cause while running the utils.
     """
+
+class AfctlDeploymentException(AfctlException):
+    """
+        Exceptions caused while running deployment code.
+    """

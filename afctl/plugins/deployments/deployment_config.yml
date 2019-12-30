@@ -1,3 +1,5 @@
 global:
-  origin:
-qubole:
+  git:
+    origin:
+deployment:
+  qubole:

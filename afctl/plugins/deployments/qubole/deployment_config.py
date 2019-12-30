@@ -11,12 +11,21 @@ from afctl.plugins.deployments.base_deployment_config import BaseDeploymentConfi
 class QuboleDeploymentConfig(BaseDeploymentConfig):
 
     # This is required to be displayed on the usage command. Please add the same to your deployment file.
-    PARSER_USAGE = \
+    CONFIG_PARSER_USAGE = \
     '            [ Qubole ]\n'+\
     '               -n : name of connection\n'+\
     '               -e : name of environment\n'+\
     '               -c : cluster label\n'+\
     '               -t : auth token\n'
+
+    DEPLOY_PARSER_USAGE = \
+    '   [qubole] - Deploy your project to QDS.\n'+\
+    '       Arguments:\n'+\
+    '           -n : Name of the deployment\n'
+
+    @classmethod
+    def generate_dirs(cls, main_dir, project_name):
+        pass
 
     @classmethod
     def validate_configs(cls, args):

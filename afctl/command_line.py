@@ -21,7 +21,7 @@ def main():
 
 if __name__ == '__main__':
     try:
-        sys.exit(main())
+        main()
     except Exception as e:
         logging.error(e)
         print(e)

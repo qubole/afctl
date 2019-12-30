@@ -42,7 +42,9 @@ class Parser():
             project_name = os.path.basename(main_dir)
             config_dir = Utility.CONSTS['config_dir']
             config_file = Utility.project_config(project_name)
-            sub_files = ['__init__.py', 'afctl_project_meta.yml']
+            sub_files = ['afctl_project_meta.yml', '.gitignore']
+            sub_dirs = [project_name, 'deployments']
+            project_init_file = ['__init__.py']
 
             if not os.path.exists(config_dir):
                 os.mkdir(config_dir)
@@ -58,22 +60,32 @@ class Parser():
             if args.name != '.':
                 os.mkdir(main_dir)
 
-            # STEP - 2: create files
+            # STEP - 2: create files and dirs
             files = Utility.create_files([main_dir], sub_files)
-            os.system("echo 'project: {}' >> {}".format(project_name, files[sub_files[1]]))
+            os.system("echo 'project: {}' >> {}".format(project_name, files['afctl_project_meta.yml']))
+
+
+            dirs = Utility.create_dirs([main_dir], sub_dirs)
+
+            dirs = Utility.create_files([dirs[sub_dirs[0]]], project_init_file)
 
             #STEP - 3: create config file
-            os.system("cat {}/plugins/deployments/deployment_config.yml > {}".format(os.path.dirname(os.path.abspath(__file__)), config_file))
+            subprocess.run(['cp', '{}/plugins/deployments/deployment_config.yml'.format(os.path.dirname(os.path.abspath(__file__))), config_file])
+            subprocess.run(['cp', '{}/gitignore.txt'.format(os.path.dirname(os.path.abspath(__file__))), files['.gitignore']])
 
             #STEP - 4: Add git origin.
             origin = subprocess.run(['git', '--git-dir={}'.format(os.path.join(main_dir, '.git')), 'config', '--get', 'remote.origin.url'], stdout=subprocess.PIPE)
             origin = origin.stdout.decode('utf-8')[:-1]
             if origin == '':
+                subprocess.run(['git', 'init', main_dir])
                 print("Git origin is not set for this repository. Run 'afctl config global -o <origin>'")
             else:
                 Utility.update_config(project_name, {'global':{'origin':origin}})
                 print("Setting origin as : {}".format(origin))
                 logging.info("Origin set as : {}".format(origin))
+
+            # STEP - 5: Generate files if required by deployments.
+            DeploymentConfig.generate_dirs(main_dir, project_name)
 
             print("New project initialized successfully.")
             logging.info("Project created.")
@@ -138,6 +150,30 @@ class Parser():
         except Exception as e:
             raise AfctlParserException(e)
 
+
+    @classmethod
+    def deploy(cls, args):
+        try:
+            logging.info("Deploy method called.")
+
+            # args.p will always be None
+            config_file = cls.validate_project(None)
+            if config_file is None:
+                cls.parser.error("Invalid project.")
+                logging.error("Invalid project.")
+
+            flag, msg = DeploymentConfig.deploy_project(args, config_file)
+
+            if flag:
+                print("Deployment failed. See usage.")
+                cls.parser.error(msg)
+
+            print("Deployment successful on {}".format(args.type))
+            logging.info("Project deployed.")
+
+        except Exception as e:
+            raise AfctlParserException(e)
+
 ########################################################################################################################
 
     @classmethod
@@ -166,7 +202,6 @@ class Parser():
                 'parser': 'config',
                 'help': 'Setup configs for your project. Read documentation for argument types.\n'+
                         'TYPES:\n'+
-                        'Argument\n'+
                         '   add - add a config for your deployment.\n'+
                         '   update - update an existing config for your deployment.\n'+
                         '       Arguments:\n'+
@@ -181,7 +216,7 @@ class Parser():
                         ,
                 'args': [
                     ['type', {'choices':['add', 'update', 'show', 'global']}],
-                    ['-d', {'choices': Utility.read_meta()['deployment']}],
+                    ['-d', {'choices': ['qubole']}],
                     ['-o'],
                     ['-p'],
                     ['-n'],
@@ -190,6 +225,19 @@ class Parser():
                     ['-t']
                 ]
 
+            },
+
+            {
+                'func': cls.deploy,
+                'parser': 'deploy',
+                'help': 'Deploy your afctl project on the preferred platform.\n'+
+                        'TYPES:\n'+
+                            DeploymentConfig.DEPLOY_DETAILS
+                        ,
+                'args': [
+                    ['type', {'choices':Utility.read_meta()['deployment']}],
+                    ['-d',{'action':'store_true'}]
+                ]
             }
 
         )

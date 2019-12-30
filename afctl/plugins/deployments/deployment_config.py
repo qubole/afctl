@@ -33,7 +33,7 @@ class DeploymentConfig(BaseDeploymentConfig):
     def deploy_project(cls, args, config_file):
         try:
 
-            if args.type == "docker":
+            if args.type == "docker-local":
                 return DockerDeploymentConfig.deploy_project(args, config_file)
 
         except Exception as e:

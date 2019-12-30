@@ -6,16 +6,16 @@ import subprocess
 
 # Yaml Structure
 #   deployment:
-#       docker:
+#       docker-local:
 #           compose:
 
 class DockerDeploymentConfig(BaseDeploymentConfig):
     CONFIG_PARSER_USAGE = \
-        '            [ docker ]\n'+\
+        '            [ docker-local ]\n'+\
         '               Cannot add/update configs.\n'
 
     DEPLOY_PARSER_USAGE = \
-        '   [docker] - Deploy your project to local docker.\n'+ \
+        '   [docker-local] - Deploy your project to local docker.\n'+ \
         '       Arguments:\n'+ \
         '           -d : To run in daemon mode\n'
 
@@ -25,7 +25,7 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
         file_path = os.path.dirname(os.path.abspath(__file__))
         composer_file = os.path.join(file_path, 'afctl-docker-compose.yml')
         os.system("cp {} {}/deployments/{}-docker-compose.yml".format(composer_file, main_dir, project_name))
-        Utility.update_config(project_name, {'deployment':{'docker':{'compose': "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)}}})
+        Utility.update_config(project_name, {'deployment':{'docker-local':{'compose': "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)}}})
 
         # Change dags directory in volume
 
@@ -34,7 +34,7 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
     @classmethod
     def deploy_project(cls, args, config_file):
 
-        print("Deploying afctl project to docker")
+        print("Deploying afctl project to docker-local")
 
         with open(Utility.project_config(config_file)) as file:
             config = yaml.full_load(file)
@@ -44,9 +44,9 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
             return True, "Docker is not running. Please start docker."
 
         if args.d:
-            os.system("docker-compose -f {} up -d".format(config['deployment']['docker']['compose']))
+            os.system("docker-compose -f {} up -d".format(config['deployment']['docker-local']['compose']))
         else:
-            os.system("docker-compose -f {} up ".format(config['deployment']['docker']['compose']))
+            os.system("docker-compose -f {} up ".format(config['deployment']['docker-local']['compose']))
 
         return False, ""
 

@@ -29,6 +29,3 @@ logs
 */bin/**
 .tox
 .DS_Store
-afctl_project_meta.yml
-deployments
-deployments/*

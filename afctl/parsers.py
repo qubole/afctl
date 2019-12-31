@@ -79,10 +79,12 @@ class Parser():
             if origin == '':
                 subprocess.run(['git', 'init', main_dir])
                 print("Git origin is not set for this repository. Run 'afctl config global -o <origin>'")
+                print("To set git auth token run 'afctl config global -t <token>'")
             else:
                 Utility.update_config(project_name, {'global':{'origin':origin}})
                 print("Setting origin as : {}".format(origin))
                 logging.info("Origin set as : {}".format(origin))
+                print("To set git auth token run 'afctl config global -t <token>'")
 
             # STEP - 5: Generate files if required by deployments.
             DeploymentConfig.generate_dirs(main_dir, project_name)
@@ -119,8 +121,15 @@ class Parser():
                 origin = args.o
                 if args.o is None:
                     origin = input("Git origin for deployment : ")
+                if origin != '':
+                    Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
 
-                Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
+                token = args.t
+                if args.t is None:
+                    token = input("Git auth token : ")
+                if token != '':
+                    Utility.update_config(config_file, {'global':{'git':{'token':token}}})
+
                 logging.info("Global configs updated.")
 
             # If adding or updating configs.
@@ -212,7 +221,9 @@ class Parser():
                         '       Arguments:\n'+
                         '           -p : Project\n'+
                         '           -o : Set git origin for deployment\n'+
-                        '   show -  Show the config file on console'
+                        '           -t : Set git auth token\n'+
+                        '   show -  Show the config file on console\n'+
+                        '       No arguments.'
                         ,
                 'args': [
                     ['type', {'choices':['add', 'update', 'show', 'global']}],
@@ -236,7 +247,8 @@ class Parser():
                         ,
                 'args': [
                     ['type', {'choices':Utility.read_meta()['deployment']}],
-                    ['-d',{'action':'store_true'}]
+                    ['-d',{'action':'store_true'}],
+                    ['-n']
                 ]
             }
 

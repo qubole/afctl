@@ -1,4 +1,7 @@
 from afctl.plugins.deployments.base_deployment_config import BaseDeploymentConfig
+import yaml
+from afctl.utils import Utility
+import subprocess
 
 # YAML structure
 # deployment:
@@ -74,3 +77,28 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
                 return {args.n:config}, False, ""
 
         return {}, False, "Some error has occurred."
+
+
+    @classmethod
+    def deploy_project(cls, args, config_file):
+
+        if args.n is None:
+            return True, "-n is required. Check usage."
+
+        name = args.n
+        print("Deploying afctl project to QDS")
+
+        with open(Utility.project_config(config_file)) as file:
+            config = yaml.full_load(file)
+
+        project = config_file[:-4]
+        git_token = config['global']['token']
+        config = config['deployment']['qubole'][name]['env']
+        env = config['env']
+        cluster = config['cluster']
+        token = config['token']
+        branch = subprocess.run(['git', 'symbolic-ref', '--short', 'HEAD'], stdout=subprocess.PIPE).stdout.decode('utf-8')[:-1]
+
+
+
+        return False, ""

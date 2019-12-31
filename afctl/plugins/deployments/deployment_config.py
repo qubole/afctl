@@ -36,5 +36,8 @@ class DeploymentConfig(BaseDeploymentConfig):
             if args.type == "docker-local":
                 return DockerDeploymentConfig.deploy_project(args, config_file)
 
+            if args.type == "qubole":
+                return QuboleDeploymentConfig.deploy_project(args, config_file)
+
         except Exception as e:
             raise AfctlDeploymentException(e)

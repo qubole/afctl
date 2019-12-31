@@ -10,7 +10,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     url="TODO",
     author="Aaditya Sharma",
-    author_email="one.aadityasharma@gmail.com",
+    author_email="asharma@qubole.com",
     description="Python commandline tool to make deployment of Airflow projects easier.",
     packages=find_packages(),
     include_package_data=True,

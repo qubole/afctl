@@ -5,5 +5,5 @@ include README.md
 include setup.cfg
 include afctl/meta.yml
 include afctl/plugins/deployments/deployment_config.yml
-include afctl/gitignore.txt
+include afctl/templates/gitignore.txt
 include afctl/plugins/deployments/docker/afctl-docker-compose.yml

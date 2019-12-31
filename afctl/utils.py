@@ -3,6 +3,7 @@ import itertools
 import subprocess
 import yaml
 from afctl.exceptions import AfctlUtilsException
+from afctl.templates.dag_template import dag_template
 
 class Utility():
 
@@ -127,3 +128,10 @@ class Utility():
             print("New configuration added successfully.")
         except Exception as e:
             raise AfctlUtilsException(e)
+
+    @staticmethod
+    def generate_dag_template(config_file, name):
+        dag_file = dag_template(name)
+        with open('{}_dag.py'.format(name), 'w') as file:
+            file.write(dag_file)
+

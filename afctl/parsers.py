@@ -71,7 +71,7 @@ class Parser():
 
             #STEP - 3: create config file
             subprocess.run(['cp', '{}/plugins/deployments/deployment_config.yml'.format(os.path.dirname(os.path.abspath(__file__))), config_file])
-            subprocess.run(['cp', '{}/gitignore.txt'.format(os.path.dirname(os.path.abspath(__file__))), files['.gitignore']])
+            subprocess.run(['cp', '{}/templates/gitignore.txt'.format(os.path.dirname(os.path.abspath(__file__))), files['.gitignore']])
 
             #STEP - 4: Add git origin.
             origin = subprocess.run(['git', '--git-dir={}'.format(os.path.join(main_dir, '.git')), 'config', '--get', 'remote.origin.url'], stdout=subprocess.PIPE)
@@ -183,6 +183,24 @@ class Parser():
         except Exception as e:
             raise AfctlParserException(e)
 
+
+    @classmethod
+    def generate(cls, args):
+
+        try:
+            config_file = cls.validate_project(None)
+            if config_file is None:
+                cls.parser.error("Invalid project.")
+                logging.error("Invalid project.")
+
+            if args.type == "dag":
+                Utility.generate_dag_template(config_file, args.n)
+
+            print("Template generated successfully.")
+
+        except Exception as e:
+            raise AfctlParserException(e)
+
 ########################################################################################################################
 
     @classmethod
@@ -249,6 +267,16 @@ class Parser():
                     ['type', {'choices':Utility.read_meta()['deployment']}],
                     ['-d',{'action':'store_true'}],
                     ['-n']
+                ]
+            },
+
+            {
+                'func': cls.generate,
+                'parser': 'generate',
+                'help': 'Generators',
+                'args': [
+                    ['type', {'choices':['dag']}],
+                    ['-n', {'required':'True'}]
                 ]
             }
 

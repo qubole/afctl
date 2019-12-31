@@ -1,6 +1,8 @@
 import subprocess
 from afctl.exceptions import AfctlDeploymentException
 from mako.template import Template
+from qds_sdk.qubole import Qubole
+from qds_sdk.commands import ShellCommand
 
 class QuboleUtils():
 
@@ -23,15 +25,14 @@ class QuboleUtils():
     def get_git_command(project, origin, branch, latest_commit_on_remote):
         template = Template(
             """
-            cd /tmp
-            mkdir qubole_${latest_commit_on_remote}
-            cd qubole_${latest_commit_on_remote}
-            git clone --single-branch -b ${branch} ${origin}
-            cd ${project}
-            source /etc/profile.d/airflow.sh
-            yes | cp -rf ${project} $AIRFLOW_HOME/dags/
-            rm -rf /tmp/qubole_${latest_commit_on_remote}
-            """
+cd /tmp
+mkdir qubole_${latest_commit_on_remote}
+cd qubole_${latest_commit_on_remote}
+git clone --single-branch -b ${branch} ${origin}
+cd ${project}
+source /etc/profile.d/airflow.sh
+yes | cp -rf ${project} $AIRFLOW_HOME/dags/
+rm -rf /tmp/qubole_${latest_commit_on_remote}"""
         )
 
         return template.render_unicode(
@@ -40,3 +41,9 @@ class QuboleUtils():
             origin = origin,
             project = project
         )
+
+    @staticmethod
+    def run_qds_command(env, cluster, token, qds_command):
+        Qubole.configure(api_token = token, api_url = env)
+        shell_cmd = ShellCommand.run(inline=qds_command, label=cluster)
+        return shell_cmd

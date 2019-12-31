@@ -116,7 +116,10 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             print("Deploying commit : {} on QDS".format(latest_commit_on_remote))
 
             qds_command = QuboleUtils.get_git_command(project, origin, branch, latest_commit_on_remote)
-            print(qds_command)
+
+            command = QuboleUtils.run_qds_command(env, cluster, token, qds_command)
+            print(command)
+
 
             return False, ""
 

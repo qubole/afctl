@@ -94,7 +94,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             with open(Utility.project_config(config_file)) as file:
                 config = yaml.full_load(file)
 
-            project = config_file[:-4]
+            project = config_file
             git_token = config['global']['git']['token']
             origin = config['global']['git']['origin']
 
@@ -115,6 +115,8 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             print("Latest commit of {} on origin {} found.".format(branch, origin))
             print("Deploying commit : {} on QDS".format(latest_commit_on_remote))
 
+            qds_command = QuboleUtils.get_git_command(project, origin, branch, latest_commit_on_remote)
+            print(qds_command)
 
             return False, ""
 

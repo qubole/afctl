@@ -81,7 +81,7 @@ class Parser():
                 print("Git origin is not set for this repository. Run 'afctl config global -o <origin>'")
                 print("To set git auth token run 'afctl config global -t <token>'")
             else:
-                Utility.update_config(project_name, {'global':{'origin':origin}})
+                Utility.update_config(project_name, {'global':{'git':{'origin':origin}}})
                 print("Setting origin as : {}".format(origin))
                 logging.info("Origin set as : {}".format(origin))
                 print("To set git auth token run 'afctl config global -t <token>'")

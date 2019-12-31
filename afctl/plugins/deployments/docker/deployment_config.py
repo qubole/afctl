@@ -1,4 +1,5 @@
 from afctl.plugins.deployments.base_deployment_config import BaseDeploymentConfig
+from afctl.exceptions import AfctlDeploymentException
 import os
 import yaml
 from afctl.utils import Utility
@@ -22,31 +23,38 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
 
     @classmethod
     def generate_dirs(cls, main_dir, project_name):
-        file_path = os.path.dirname(os.path.abspath(__file__))
-        composer_file = os.path.join(file_path, 'afctl-docker-compose.yml')
-        os.system("cp {} {}/deployments/{}-docker-compose.yml".format(composer_file, main_dir, project_name))
-        Utility.update_config(project_name, {'deployment':{'docker-local':{'compose': "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)}}})
+        try:
+            file_path = os.path.dirname(os.path.abspath(__file__))
+            composer_file = os.path.join(file_path, 'afctl-docker-compose.yml')
+            os.system("cp {} {}/deployments/{}-docker-compose.yml".format(composer_file, main_dir, project_name))
+            Utility.update_config(project_name, {'deployment':{'docker-local':{'compose': "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)}}})
 
         # Change dags directory in volume
-
+        except Exception as e:
+            raise AfctlDeploymentException(e)
 
 
     @classmethod
     def deploy_project(cls, args, config_file):
 
-        print("Deploying afctl project to docker-local")
+        try:
 
-        with open(Utility.project_config(config_file)) as file:
-            config = yaml.full_load(file)
+            print("Deploying afctl project to docker-local")
 
-        val = subprocess.call(['docker', 'info'])
-        if val != 0:
-            return True, "Docker is not running. Please start docker."
+            with open(Utility.project_config(config_file)) as file:
+                config = yaml.full_load(file)
 
-        if args.d:
-            os.system("docker-compose -f {} up -d".format(config['deployment']['docker-local']['compose']))
-        else:
-            os.system("docker-compose -f {} up ".format(config['deployment']['docker-local']['compose']))
+            val = subprocess.call(['docker', 'info'])
+            if val != 0:
+                return True, "Docker is not running. Please start docker."
 
-        return False, ""
+            if args.d:
+                os.system("docker-compose -f {} up -d".format(config['deployment']['docker-local']['compose']))
+            else:
+                os.system("docker-compose -f {} up ".format(config['deployment']['docker-local']['compose']))
+
+            return False, ""
+
+        except Exception as e:
+            raise AfctlDeploymentException(e)
 

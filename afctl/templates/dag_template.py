@@ -1,13 +1,13 @@
 from mako.template import Template
 
-def dag_template(name):
+def dag_template(name, config_name):
     template = Template(
 """
 from airflow import DAG
 from datetime import datetime, timedelta
 
 default_args = {
-'owner': 'airflow',
+'owner': '${config_name}',
 # 'depends_on_past': ,
 # 'start_date': ,
 # 'email': ,
@@ -24,4 +24,4 @@ dag = DAG(dag_id=${name}, default_args=default_args)
 """
     )
 
-    return template.render_unicode(name=name)
+    return template.render_unicode(name=name, config_name=config_name)

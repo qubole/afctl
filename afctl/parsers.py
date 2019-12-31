@@ -135,7 +135,7 @@ class Parser():
             # If adding or updating configs.
             elif args.type == 'add' or  args.type == 'update':
                 if args.d is None:
-                    cls.parser.error("-d argument is required. Check usage.")
+                    cls.parser.error("-d argument is required. Check usage. Run 'afctl config -h'")
 
                 # Sanitize values.
                 configs, flag, msg = DeploymentConfig.validate_configs(args)
@@ -174,7 +174,7 @@ class Parser():
             flag, msg = DeploymentConfig.deploy_project(args, config_file)
 
             if flag:
-                print("Deployment failed. See usage.")
+                print("Deployment failed. See usage. Run 'afctl deploy -h'")
                 cls.parser.error(msg)
 
             print("Deployment successful on {}".format(args.type))

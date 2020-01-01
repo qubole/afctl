@@ -83,6 +83,7 @@ class Parser():
         except Exception as e:
             raise AfctlParserException(e)
 
+
     @classmethod
     def config(cls, args):
         try:
@@ -91,34 +92,7 @@ class Parser():
             if config_file is None:
                 cls.parser.error("Invalid project.")
 
-            # Setting global values.
-            if args.type == "global":
-                origin = args.o
-                if args.o is None:
-                    origin = input("Git origin for deployment : ")
-                if origin != '':
-                    Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
-
-            # If adding or updating configs.
-            elif args.type == 'add' or  args.type == 'update':
-                if args.d is None:
-                    cls.parser.error("-d argument is required. Check usage. Run 'afctl config -h'")
-
-                # Sanitize values.
-                configs, flag, msg = DeploymentConfig.validate_configs(args)
-
-                if flag:
-                    cls.parser.error(msg)
-                else:
-                    if args.type == 'update':
-                        Utility.update_config(config_file, configs)
-                    if args.type == 'add':
-                        Utility.add_configs(['deployment', args.d],config_file, configs)
-
-            # Showing configs
-            elif args.type == 'show':
-                Utility.print_file(Utility.project_config(config_file))
-
+            cls.act_on_configs(args, config_file)
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -209,7 +183,8 @@ class Parser():
                     ['-p'],
                     ['-n'],
                     ['-e'],
-                    ['-c']
+                    ['-c'],
+                    ['-t']
                 ]
 
             },
@@ -273,3 +248,38 @@ class Parser():
             return config_file
         except Exception as e:
             raise AfctlParserException(e)
+
+
+    @classmethod
+    def act_on_configs(cls, args, config_file):
+        try:
+
+            # Setting global values.
+            if args.type == "global":
+                origin = args.o
+                if args.o is None:
+                    origin = input("Git origin for deployment : ")
+                if origin != '':
+                    Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
+
+            # If adding or updating configs.
+            elif args.type == 'add' or  args.type == 'update':
+                if args.d is None:
+                    cls.parser.error("-d argument is required. Check usage. Run 'afctl config -h'")
+
+                # Sanitize values.
+                configs, flag, msg = DeploymentConfig.validate_configs(args)
+                if flag:
+                    cls.parser.error(msg)
+                else:
+                    if args.type == 'update':
+                        Utility.update_config(config_file, configs)
+                    if args.type == 'add':
+                        Utility.add_configs(['deployment', args.d],config_file, configs)
+
+            # Showing configs
+            elif args.type == 'show':
+                Utility.print_file(Utility.project_config(config_file))
+
+        except Exception as e:
+            AfctlParserException(e)

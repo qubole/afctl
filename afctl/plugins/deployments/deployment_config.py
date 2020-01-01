@@ -24,7 +24,6 @@ class DeploymentConfig(BaseDeploymentConfig):
             if args.d == 'qubole':
                 return QuboleDeploymentConfig.validate_configs(args)
 
-
         except Exception as e:
             raise AfctlDeploymentException(e)
 

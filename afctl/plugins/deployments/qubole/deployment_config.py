@@ -36,10 +36,8 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
     def validate_configs(cls, args):
         try:
             config = {}
-
             # No argument is provided. So we will ask for the input from the user.
             if args.e is None and args.c is None and args.t is None:
-
                 # User could have provided the name of the connection.
                 name = input("Enter name of connection : ") if args.n is None else args.n
                 config['env'] = input("Enter environment : ")

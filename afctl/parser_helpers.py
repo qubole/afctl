@@ -1,6 +1,7 @@
 from afctl.utils import Utility
 import os
 import subprocess
+from termcolor import colored
 
 class ParserHelpers():
 
@@ -33,7 +34,7 @@ class ParserHelpers():
         origin = origin.stdout.decode('utf-8')[:-1]
         if origin == '':
             subprocess.run(['git', 'init', files['main_dir']])
-            print("Git origin is not set for this repository. Run 'afctl config global -o <origin>'")
+            print(colored("Git origin is not set for this repository. Run 'afctl config global -o <origin>'", 'yellow'))
         else:
             Utility.update_config(files['project_name'], {'global':{'git':{'origin':origin}}})
             print("Setting origin as : {}".format(origin))

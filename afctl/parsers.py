@@ -8,6 +8,7 @@ from afctl.exceptions import AfctlParserException
 import subprocess
 from afctl.plugins.deployments.deployment_config import DeploymentConfig
 from afctl.parser_helpers import ParserHelpers
+from termcolor import colored
 
 
 class Parser():
@@ -44,10 +45,9 @@ class Parser():
                 os.mkdir(files['config_dir'])
 
             if os.path.exists(files['main_dir']) and os.path.exists(files['config_file']):
-                cls.parser.error("Project already exists. Please delete entry under afctl_congfis after removing\
-                                the project from the current directory.")
+                cls.parser.error(colored("Project already exists. Please delete entry under /home/afctl_congfis", 'red'))
 
-            print("Initializing new project...")
+            print(colored("Initializing new project...", 'green'))
 
             # STEP - 1: Create parent dir
             if args.name != '.':
@@ -68,7 +68,7 @@ class Parser():
             # STEP - 5: Generate files if required by deployments.
             DeploymentConfig.generate_dirs(files['main_dir'], files['project_name'])
 
-            print("New project initialized successfully.")
+            print(colored("New project initialized successfully.", 'green'))
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -77,7 +77,7 @@ class Parser():
     @classmethod
     def list(cls, args):
         try:
-            print("Available {} :".format(args.type))
+            print(colored("Available {} :".format(args.type), 'green'))
             print('\n'.join(map(str, Utility.read_meta()[args.type])))
 
         except Exception as e:
@@ -90,7 +90,7 @@ class Parser():
             config_file = cls.validate_project(args.p)
 
             if config_file is None:
-                cls.parser.error("Invalid project.")
+                cls.parser.error(colored("Invalid project.", 'red'))
 
             cls.act_on_configs(args, config_file)
 
@@ -101,19 +101,18 @@ class Parser():
     @classmethod
     def deploy(cls, args):
         try:
-
             # args.p will always be None
             config_file = cls.validate_project(None)
             if config_file is None:
-                cls.parser.error("Invalid project.")
+                cls.parser.error(colored("Invalid project.", 'red'))
 
             flag, msg = DeploymentConfig.deploy_project(args, config_file)
 
             if flag:
-                print("Deployment failed. See usage. Run 'afctl deploy -h'")
-                cls.parser.error(msg)
+                print(colored("Deployment failed. See usage. Run 'afctl deploy -h'", 'yellow'))
+                cls.parser.error(colored(msg), 'red')
 
-            print("Deployment successful on {}".format(args.type))
+            print(colored("Deployment successful on {}".format(args.type), 'green'))
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -125,12 +124,12 @@ class Parser():
         try:
             config_file = cls.validate_project(None)
             if config_file is None:
-                cls.parser.error("Invalid project.")
+                cls.parser.error(colored("Invalid project.", 'red'))
 
             if args.type == "dag":
                 Utility.generate_dag_template(config_file, args.n)
 
-            print("Template generated successfully.")
+            print(colored("Template generated successfully.", 'yellow'))
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -227,7 +226,7 @@ class Parser():
             if args is not None:
                 # -p <arg> does not have a config file.
                 if not os.path.exists(Utility.project_config(args)):
-                    cls.parser.error("{} is not an afctl project. Config file does not exists".format(args))
+                    cls.parser.error(colored("{} is not an afctl project. Config file does not exists".format(args), 'red'))
                 else:
                     # -p <arg> has a config file.
                     config_file = args
@@ -239,11 +238,11 @@ class Parser():
                 config_file = Utility.find_project(pwd)
                 if config_file is None:
                     # Could not find .afctl_project
-                    cls.parser.error("{} is not an afctl project.".format(pwd))
+                    cls.parser.error(colored("{} is not an afctl project.".format(pwd), 'red'))
                 else:
                     # Check is the dir containing .afctl_project has a config file
                     if not os.path.exists(Utility.project_config(config_file)):
-                        cls.parser.error("Config file does not exists for {}".format(config_file))
+                        cls.parser.error(colored("Config file does not exists for {}".format(config_file), 'red'))
 
             return config_file
         except Exception as e:
@@ -265,12 +264,12 @@ class Parser():
             # If adding or updating configs.
             elif args.type == 'add' or  args.type == 'update':
                 if args.d is None:
-                    cls.parser.error("-d argument is required. Check usage. Run 'afctl config -h'")
+                    cls.parser.error(colored("-d argument is required. Check usage. Run 'afctl config -h'", 'red'))
 
                 # Sanitize values.
                 configs, flag, msg = DeploymentConfig.validate_configs(args)
                 if flag:
-                    cls.parser.error(msg)
+                    cls.parser.error(colored(msg), 'red')
                 else:
                     if args.type == 'update':
                         Utility.update_config(config_file, configs)

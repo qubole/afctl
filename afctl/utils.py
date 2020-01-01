@@ -4,6 +4,7 @@ import subprocess
 import yaml
 from afctl.exceptions import AfctlUtilsException
 from afctl.templates.dag_template import dag_template
+from termcolor import colored
 
 class Utility():
 
@@ -65,7 +66,7 @@ class Utility():
         try:
             path = Utility.project_config(file)
             if not os.path.exists(path):
-                print("Project's config file does not exists")
+                print(colored("Project's config file does not exists", 'red'))
                 raise Exception("Project's config file does not exists")
 
             with open(path) as file:
@@ -74,7 +75,7 @@ class Utility():
             with open(path, 'w') as file:
                 yaml.dump(crawler, file, default_flow_style=False, sort_keys=False)
 
-            print("Configurations updated.")
+            print(colored("Configurations updated.", 'green'))
         except Exception as e:
             raise AfctlUtilsException(e)
 
@@ -105,7 +106,7 @@ class Utility():
         try:
             path = Utility.project_config(config_file)
             if not os.path.exists(path):
-                print("Project's config file does not exists")
+                print(colored("Project's config file does not exists", 'red'))
                 raise Exception("Project's config file does not exists")
 
             with open(path) as file:
@@ -124,7 +125,7 @@ class Utility():
             with open(path, 'w') as file:
                 yaml.dump(crawler, file, default_flow_style=False, sort_keys=False)
 
-            print("New configuration added successfully.")
+            print(colored("New configuration added successfully.", 'green'))
         except Exception as e:
             raise AfctlUtilsException(e)
 

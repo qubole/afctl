@@ -129,7 +129,7 @@ class Parser():
             if args.type == "dag":
                 Utility.generate_dag_template(config_file, args.n)
 
-            print(colored("Template generated successfully.", 'yellow'))
+            print(colored("Template generated successfully.", 'green'))
 
         except Exception as e:
             raise AfctlParserException(e)

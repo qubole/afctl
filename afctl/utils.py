@@ -74,7 +74,7 @@ class Utility():
             with open(path, 'w') as file:
                 yaml.dump(crawler, file, default_flow_style=False, sort_keys=False)
 
-            print("Configs updated.")
+            print("Configurations updated.")
         except Exception as e:
             raise AfctlUtilsException(e)
 

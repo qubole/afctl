@@ -1,4 +1,4 @@
-#afctl
+# afctl
 
 The proposed CLI tool is being authored to make creating and deployment of airflow projects faster and smoother. 
 As of now, there is no tool out there that can empower the user to create a boilerplate code structure for airflow 
@@ -24,7 +24,7 @@ pip3 install .
 ## Requirements
 Python 3.5+
 
-##Usage
+## Usage
 
 Commands right now supported are
 * init

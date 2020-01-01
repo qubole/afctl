@@ -95,7 +95,6 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
                 config = yaml.full_load(file)
 
             project = config_file
-            git_token = config['global']['git']['token']
             origin = config['global']['git']['origin']
 
             if origin is None or origin == '':

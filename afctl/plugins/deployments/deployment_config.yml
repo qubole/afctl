@@ -1,7 +1,6 @@
 global:
   git:
     origin:
-    token:
 deployment:
   qubole:
   docker-local:

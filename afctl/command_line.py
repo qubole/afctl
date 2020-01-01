@@ -24,4 +24,3 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         logging.error(e)
-        print(e)

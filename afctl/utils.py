@@ -8,8 +8,7 @@ from afctl.templates.dag_template import dag_template
 class Utility():
 
     CONSTS = {
-        'config_dir': os.path.join(os.path.expanduser("~"), 'afctl_config'),
-        'project_meta': 'afctl_project_meta.yml'
+        'config_dir': os.path.join(os.path.expanduser("~"), 'afctl_config')
     }
 
     @staticmethod
@@ -97,7 +96,7 @@ class Utility():
         dirs = pwd.lstrip('/').split('/')
         for i in range(len(dirs)+1):
             path = '/'.join(dirs[:i])
-            if os.path.exists(os.path.join('/'+path, Utility.CONSTS['project_meta'])):
+            if os.path.exists(os.path.join('/'+path, '.afctl_project')):
                 return dirs[i-1]
         return None
 

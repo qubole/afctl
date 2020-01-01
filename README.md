@@ -126,7 +126,7 @@ afctl configs update -d {deployment}
 * Prompts the user to update the values
 * Can also provide inline arguments.
 
-### Deploy projects
+#### Deploy projects
 
 ```bash
 TYPES:

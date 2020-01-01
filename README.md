@@ -126,6 +126,26 @@ afctl configs update -d {deployment}
 * Prompts the user to update the values
 * Can also provide inline arguments.
 
+### Deploy projects
+
+```bash
+TYPES:
+   [qubole] - Deploy your project to QDS.
+       Arguments:
+           -n : Name of the deployment
+   [docker-local] - Deploy your project to local docker.
+       Arguments:
+           -d : To run in daemon mode
+
+positional arguments:
+  {qubole,docker-local}
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d
+  -n N
+```
+
 ```bash
 afctl deploy {deployment} -n {name of connection}
 ```

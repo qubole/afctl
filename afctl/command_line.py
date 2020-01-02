@@ -3,7 +3,7 @@ __author__ = 'Aaditya Sharma'
 from afctl.parsers import Parser
 from afctl.exceptions import AfctlParserException
 import logging
-import sys
+from termcolor import colored
 
 def main():
     try:
@@ -11,7 +11,7 @@ def main():
         args = parser.parse_args()
 
         if not any(vars(args).values()):
-            parser.error('No arguments provided.')
+            parser.error(colored('No arguments provided.', 'red'))
 
         args.func(args)
 
@@ -21,7 +21,6 @@ def main():
 
 if __name__ == '__main__':
     try:
-        sys.exit(main())
+        main()
     except Exception as e:
         logging.error(e)
-        print(e)

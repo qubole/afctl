@@ -1,13 +1,14 @@
 __author__ = 'Aaditya Sharma'
 
 import argparse
-import logging
 import os
 from afctl import __version__
 from afctl.utils import Utility
 from afctl.exceptions import AfctlParserException
 import subprocess
 from afctl.plugins.deployments.deployment_config import DeploymentConfig
+from afctl.parser_helpers import ParserHelpers
+from termcolor import colored
 
 
 class Parser():
@@ -37,46 +38,21 @@ class Parser():
     @classmethod
     def init(cls, args):
         try:
-            pwd = os.getcwd()
-            main_dir = pwd if args.name == '.' else os.path.join(pwd, args.name.lstrip('/').rstrip('/'))
-            project_name = os.path.basename(main_dir)
-            config_dir = Utility.CONSTS['config_dir']
-            config_file = Utility.project_config(project_name)
-            sub_files = ['__init__.py', 'afctl_project_meta.yml']
 
-            if not os.path.exists(config_dir):
-                os.mkdir(config_dir)
+            files = ParserHelpers.init_file_name(args.name)
 
-            if os.path.exists(main_dir) and os.path.exists(config_file):
-                logging.error("Project already exists. Please delete entry under afctl_congfis after removing the project from the current directory.")
-                cls.parser.error("Project already exists.")
+            if not os.path.exists(files['config_dir']):
+                os.mkdir(files['config_dir'])
 
-            print("Initializing new project...")
-            logging.info("Project initialization started.")
+            if os.path.exists(files['main_dir']) and os.path.exists(files['config_file']):
+                cls.parser.error(colored("Project already exists. Please delete entry under /home/.afctl_congfis", 'red'))
 
-            # STEP - 1: Create parent dir
-            if args.name != '.':
-                os.mkdir(main_dir)
+            print(colored("Initializing new project...", 'green'))
 
-            # STEP - 2: create files
-            files = Utility.create_files([main_dir], sub_files)
-            os.system("echo 'project: {}' >> {}".format(project_name, files[sub_files[1]]))
+            # New afctl project
+            ParserHelpers.generate_project(args, files)
 
-            #STEP - 3: create config file
-            os.system("cat {}/plugins/deployments/deployment_config.yml > {}".format(os.path.dirname(os.path.abspath(__file__)), config_file))
-
-            #STEP - 4: Add git origin.
-            origin = subprocess.run(['git', '--git-dir={}'.format(os.path.join(main_dir, '.git')), 'config', '--get', 'remote.origin.url'], stdout=subprocess.PIPE)
-            origin = origin.stdout.decode('utf-8')[:-1]
-            if origin == '':
-                print("Git origin is not set for this repository. Run 'afctl config global -o <origin>'")
-            else:
-                Utility.update_config(project_name, {'global':{'origin':origin}})
-                print("Setting origin as : {}".format(origin))
-                logging.info("Origin set as : {}".format(origin))
-
-            print("New project initialized successfully.")
-            logging.info("Project created.")
+            print(colored("New project initialized successfully.", 'green'))
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -85,55 +61,73 @@ class Parser():
     @classmethod
     def list(cls, args):
         try:
-            print("Available {} :".format(args.type))
-            logging.info("Printing list on the console.")
+            print(colored("Available {} :".format(args.type), 'green'))
             print('\n'.join(map(str, Utility.read_meta()[args.type])))
 
         except Exception as e:
             raise AfctlParserException(e)
 
+
     @classmethod
     def config(cls, args):
         try:
-            logging.info("Config method called")
             config_file = cls.validate_project(args.p)
 
             if config_file is None:
-                cls.parser.error("Invalid project.")
-                logging.error("Invalid project.")
+                cls.parser.error(colored("Invalid project.", 'red'))
 
-            # Setting global values.
-            if args.type == "global":
-                origin = args.o
-                if args.o is None:
-                    origin = input("Git origin for deployment : ")
+            cls.act_on_configs(args, config_file)
 
-                Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
-                logging.info("Global configs updated.")
+        except Exception as e:
+            raise AfctlParserException(e)
 
-            # If adding or updating configs.
-            elif args.type == 'add' or  args.type == 'update':
-                if args.d is None:
-                    cls.parser.error("-d argument is required. Check usage.")
 
-                # Sanitize values.
-                configs, flag, msg = DeploymentConfig.validate_configs(args)
+    @classmethod
+    def deploy(cls, args):
+        try:
+            # args.p will always be None
+            config_file = cls.validate_project(None)
+            if config_file is None:
+                cls.parser.error(colored("Invalid project.", 'red'))
 
-                if flag:
-                    cls.parser.error(msg)
-                else:
-                    if args.type == 'update':
-                        Utility.update_config(config_file, configs)
-                    if args.type == 'add':
-                        Utility.add_configs(['deployment', args.d],config_file, configs)
+            flag, msg = DeploymentConfig.deploy_project(args, config_file)
 
-            # Showing configs
-            elif args.type == 'show':
-                Utility.print_file(Utility.project_config(config_file))
+            if flag:
+                print(colored("Deployment failed. See usage. Run 'afctl deploy -h'", 'yellow'))
+                cls.parser.error(colored(msg, 'red'))
 
-            # Unsupported argument type.
-            else:
-                cls.parser.error("Unsupported command argument {}. See usage.".format(args.type))
+            print(colored("Deployment successful on {}".format(args.type), 'green'))
+
+        except Exception as e:
+            raise AfctlParserException(e)
+
+
+    @classmethod
+    def generate(cls, args):
+
+        try:
+            project_name = cls.validate_project(None)
+            if project_name is None:
+                cls.parser.error(colored("Invalid project.", 'red'))
+
+            parent_dir = Utility.is_afctl_project(os.getcwd())
+            if args.type == "dag":
+                path = "{}/{}/dags".format(parent_dir, project_name)
+                if args.m is not None:
+                    path = os.path.join(path, args.m)
+                    if not os.path.exists(path):
+                        cls.parser.error(colored("The specified module does not exists", 'red'))
+                Utility.generate_dag_template(project_name, args.n, path)
+
+            elif args.type == "module":
+                path = "{}/{}/dags/{}".format(parent_dir, project_name, args.n)
+                test_path = "{}/tests/{}".format(parent_dir, args.n)
+                mod_val = subprocess.call(['mkdir', path])
+                test_val = subprocess.call(['mkdir', test_path])
+                if mod_val != 0 or test_val != 0:
+                    cls.parser.error(colored("Unable to generate.", 'red'))
+
+            print(colored("Generated successfully.", 'green'))
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -166,7 +160,6 @@ class Parser():
                 'parser': 'config',
                 'help': 'Setup configs for your project. Read documentation for argument types.\n'+
                         'TYPES:\n'+
-                        'Argument\n'+
                         '   add - add a config for your deployment.\n'+
                         '   update - update an existing config for your deployment.\n'+
                         '       Arguments:\n'+
@@ -177,11 +170,12 @@ class Parser():
                         '       Arguments:\n'+
                         '           -p : Project\n'+
                         '           -o : Set git origin for deployment\n'+
-                        '   show -  Show the config file on console'
+                        '   show -  Show the config file on console\n'+
+                        '       No arguments.'
                         ,
                 'args': [
                     ['type', {'choices':['add', 'update', 'show', 'global']}],
-                    ['-d', {'choices': Utility.read_meta()['deployment']}],
+                    ['-d', {'choices': ['qubole']}],
                     ['-o'],
                     ['-p'],
                     ['-n'],
@@ -190,6 +184,33 @@ class Parser():
                     ['-t']
                 ]
 
+            },
+
+            {
+                'func': cls.deploy,
+                'parser': 'deploy',
+                'help': 'Deploy your afctl project on the preferred platform.\n'+
+                        'TYPES:\n'+
+                            DeploymentConfig.DEPLOY_DETAILS
+                        ,
+                'args': [
+                    ['type', {'choices':Utility.read_meta()['deployment']}],
+                    ['-d',{'action':'store_true'}],
+                    ['-n']
+                ]
+            },
+
+            {
+                'func': cls.generate,
+                'parser': 'generate',
+                'help': 'Generators\n'+
+                        '-n : Name of the dag file or the module\n'+
+                        '-m : Name of module where you want to generate a dag file\n',
+                'args': [
+                    ['type', {'choices':['dag', 'module']}],
+                    ['-n', {'required':'True'}],
+                    ['-m']
+                ]
             }
 
         )
@@ -206,28 +227,59 @@ class Parser():
             if args is not None:
                 # -p <arg> does not have a config file.
                 if not os.path.exists(Utility.project_config(args)):
-                    cls.parser.error("{} is not an afctl project. Config file does not exists".format(args))
-                    logging.error("Not a project.")
+                    cls.parser.error(colored("{} is not an afctl project. Config file does not exists".format(args), 'red'))
                 else:
                     # -p <arg> has a config file.
                     config_file = args
-                    logging.info("{} is a valid afctl project".format(args))
 
             # -p <arg> is not present so lets check pwd
             else:
                 pwd = os.getcwd()
-                # If any parent of pwd contains afctl_project_meta.yml. If so then it should be the project.
+                # If any parent of pwd contains .afctl_project. If so then it should be the project.
                 config_file = Utility.find_project(pwd)
                 if config_file is None:
-                    # Could not find afctl_project_meta.yml
-                    cls.parser.error("{} is not an afctl project.".format(pwd))
-                    logging.error("Not a project.")
+                    # Could not find .afctl_project
+                    cls.parser.error(colored("{} is not an afctl project.".format(pwd), 'red'))
                 else:
-                    # Check is the dir containing afctl_project_meta.yml has a config file
+                    # Check is the dir containing .afctl_project has a config file
                     if not os.path.exists(Utility.project_config(config_file)):
-                        cls.parser.error("Config file does not exists for {}".format(config_file))
-                        logging.error("Not a project.")
+                        cls.parser.error(colored("Config file does not exists for {}".format(config_file), 'red'))
 
             return config_file
         except Exception as e:
             raise AfctlParserException(e)
+
+
+    @classmethod
+    def act_on_configs(cls, args, config_file):
+        try:
+
+            # Setting global values.
+            if args.type == "global":
+                origin = args.o
+                if args.o is None:
+                    origin = input("Git origin for deployment : ")
+                if origin != '':
+                    Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
+
+            # If adding or updating configs.
+            elif args.type == 'add' or  args.type == 'update':
+                if args.d is None:
+                    cls.parser.error(colored("-d argument is required. Check usage. Run 'afctl config -h'", 'red'))
+
+                # Sanitize values.
+                configs, flag, msg = DeploymentConfig.validate_configs(args)
+                if flag:
+                    cls.parser.error(colored(msg, 'red'))
+                else:
+                    if args.type == 'update':
+                        Utility.update_config(config_file, configs)
+                    if args.type == 'add':
+                        Utility.add_configs(['deployment', args.d],config_file, configs)
+
+            # Showing configs
+            elif args.type == 'show':
+                Utility.print_file(Utility.project_config(config_file))
+
+        except Exception as e:
+            AfctlParserException(e)

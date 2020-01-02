@@ -3,12 +3,13 @@ import itertools
 import subprocess
 import yaml
 from afctl.exceptions import AfctlUtilsException
+from afctl.templates.dag_template import dag_template
+from termcolor import colored
 
 class Utility():
 
     CONSTS = {
-        'config_dir': os.path.join(os.path.expanduser("~"), 'afctl_config'),
-        'project_meta': 'afctl_project_meta.yml'
+        'config_dir': os.path.join(os.path.expanduser("~"), '.afctl_config')
     }
 
     @staticmethod
@@ -65,7 +66,7 @@ class Utility():
         try:
             path = Utility.project_config(file)
             if not os.path.exists(path):
-                print("Project's config file does not exists")
+                print(colored("Project's config file does not exists", 'red'))
                 raise Exception("Project's config file does not exists")
 
             with open(path) as file:
@@ -74,7 +75,7 @@ class Utility():
             with open(path, 'w') as file:
                 yaml.dump(crawler, file, default_flow_style=False, sort_keys=False)
 
-            print("Configs updated.")
+            print(colored("Configurations updated.", 'green'))
         except Exception as e:
             raise AfctlUtilsException(e)
 
@@ -96,7 +97,7 @@ class Utility():
         dirs = pwd.lstrip('/').split('/')
         for i in range(len(dirs)+1):
             path = '/'.join(dirs[:i])
-            if os.path.exists(os.path.join('/'+path, Utility.CONSTS['project_meta'])):
+            if os.path.exists(os.path.join('/'+path, '.afctl_project')):
                 return dirs[i-1]
         return None
 
@@ -105,7 +106,7 @@ class Utility():
         try:
             path = Utility.project_config(config_file)
             if not os.path.exists(path):
-                print("Project's config file does not exists")
+                print(colored("Project's config file does not exists", 'red'))
                 raise Exception("Project's config file does not exists")
 
             with open(path) as file:
@@ -124,6 +125,26 @@ class Utility():
             with open(path, 'w') as file:
                 yaml.dump(crawler, file, default_flow_style=False, sort_keys=False)
 
-            print("New configuration added successfully.")
+            print(colored("New configuration added successfully.", 'green'))
+        except Exception as e:
+            raise AfctlUtilsException(e)
+
+    @staticmethod
+    def generate_dag_template(project_name, name, path):
+        dag_file = dag_template(name, project_name)
+        with open('{}/{}_dag.py'.format(path, name), 'w') as file:
+            file.write(dag_file)
+
+
+    @staticmethod
+    def is_afctl_project(pwd):
+        try:
+            dirs = pwd.lstrip('/').split('/')
+            for i in range(len(dirs)+1):
+                path = '/'.join(dirs[:i])
+                if os.path.exists(os.path.join('/'+path, '.afctl_project')):
+                    return '/'+path
+            return None
+
         except Exception as e:
             raise AfctlUtilsException(e)

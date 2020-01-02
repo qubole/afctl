@@ -18,7 +18,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
     # This is required to be displayed on the usage command. Please add the same to your deployment file.
     CONFIG_PARSER_USAGE = \
     '            [ Qubole ]\n'+\
-    '               -n : name of connection\n'+\
+    '               -n : name of deployment\n'+\
     '               -e : name of environment\n'+\
     '               -c : cluster label\n'+\
     '               -t : auth token\n'
@@ -39,7 +39,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             # No argument is provided. So we will ask for the input from the user.
             if args.e is None and args.c is None and args.t is None:
                 # User could have provided the name of the connection.
-                name = input("Enter name of connection : ") if args.n is None else args.n
+                name = input("Enter name of deployment : ") if args.n is None else args.n
                 config['env'] = input("Enter environment : ")
                 config['cluster'] = input("Enter cluster label : ")
                 config['token'] = input("Enter auth token : ")
@@ -61,7 +61,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
 
                 # Name of connection is compulsory in this flow.
                 if  args.n is None:
-                    return config, True, "Name of connection is required. Check usage."
+                    return config, True, "Name of deployment is required. Check usage."
 
                 if args.e is not None:
                     config['env'] = args.e

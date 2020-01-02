@@ -31,7 +31,15 @@ cd qubole_${latest_commit_on_remote}
 git clone --single-branch -b ${branch} ${origin}
 cd ${project}
 source /etc/profile.d/airflow.sh
+if [[ -d $AIRFLOW_HOME/dags/${project} ]]; then
+rm -rf $AIRFLOW_HOME/dags/${project}
+fi
 yes | cp -rf ${project} $AIRFLOW_HOME/dags/
+if [[ -d $AIRFLOW_HOME/plugins/${project} ]]; then
+rm -rf $AIRFLOW_HOME/plugins/${project}
+fi
+mkdir $AIRFLOW_HOME/plugins/${project}
+yes | cp -rf plugins $AIRFLOW_HOME/plugins/${project}
 rm -rf /tmp/qubole_${latest_commit_on_remote}
 cd $AIRFLOW_HOME
 sudo monit restart webserver

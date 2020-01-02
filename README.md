@@ -81,7 +81,7 @@ TYPES:
            -d : Deployment Type
            -p : Project
             [ Qubole ]
-               -n : name of connection
+               -n : name of deployment
                -e : name of environment
                -c : cluster label
                -t : auth token
@@ -148,7 +148,7 @@ optional arguments:
 ```
 
 ```bash
-afctl deploy {deployment} -n {name of connection}
+afctl deploy {deployment} -n {name of deployment}
 ```
 * Fetches the latest commit in remote origin.
 * Deploys the repository with the last commit as shown.

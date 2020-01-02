@@ -5,6 +5,6 @@ type: docker
 
 steps:
 - name: runtests
-  image: python3
+  image: python:3
   commands:
     - echo "Executed"

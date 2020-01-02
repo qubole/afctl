@@ -3,5 +3,5 @@ global:
     origin:
 deployment:
   qubole:
-  docker-local:
+  local:
     compose:

@@ -32,7 +32,7 @@ class DeploymentConfig(BaseDeploymentConfig):
     def deploy_project(cls, args, config_file):
         try:
 
-            if args.type == "docker-local":
+            if args.type == "local":
                 return DockerDeploymentConfig.deploy_project(args, config_file)
 
             if args.type == "qubole":

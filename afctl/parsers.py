@@ -110,7 +110,7 @@ class Parser():
 
             if flag:
                 print(colored("Deployment failed. See usage. Run 'afctl deploy -h'", 'yellow'))
-                cls.parser.error(colored(msg), 'red')
+                cls.parser.error(colored(msg, 'red'))
 
             print(colored("Deployment successful on {}".format(args.type), 'green'))
 

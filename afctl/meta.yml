@@ -6,5 +6,5 @@ hooks:
 
 deployment:
   qubole
-  docker-local
+  local
 

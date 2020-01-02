@@ -44,6 +44,10 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
                 config['cluster'] = input("Enter cluster label : ")
                 config['token'] = input("Enter auth token : ")
 
+                config, flag, msg = QuboleUtils.sanitize_configs(config, args.type, name)
+                if flag:
+                    return {}, True, msg
+
                 # If update return the entire path because we are not sure if he has updated everything or only some values.
                 if args.type == 'update':
                     return {'deployment':{'qubole':{name:config}}}, False, ""
@@ -80,7 +84,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             return {}, False, "Some error has occurred."
 
         except Exception as e:
-            raise AfctlUtilsException(e)
+            raise AfctlDeploymentException(e)
 
 
     @classmethod

@@ -44,6 +44,32 @@ rm -rf /tmp/qubole_${latest_commit_on_remote}"""
 
     @staticmethod
     def run_qds_command(env, cluster, token, qds_command):
-        Qubole.configure(api_token = token, api_url = env)
-        shell_cmd = ShellCommand.run(inline=qds_command, label=cluster)
-        return shell_cmd
+        try:
+            Qubole.configure(api_token = token, api_url = env)
+            shell_cmd = ShellCommand.run(inline=qds_command, label=cluster)
+            return shell_cmd
+
+        except Exception as e:
+            raise AfctlDeploymentException(e)
+
+    @staticmethod
+    def sanitize_configs(config, type, name):
+        try:
+            new_conf = {}
+            if name == "":
+                return {}, True, "Name cannot be blank"
+
+            if type == "add":
+                for k, v in config.items():
+                    if v == "":
+                        return {}, True, "All arguments are mandatory."
+                new_conf = config
+
+            if type == "update":
+                for k, v in config.items():
+                    if v != "":
+                        new_conf[k] = v
+
+            return new_conf, False, ""
+        except Exception as e:
+            raise AfctlDeploymentException(e)

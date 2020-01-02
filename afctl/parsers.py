@@ -269,7 +269,7 @@ class Parser():
                 # Sanitize values.
                 configs, flag, msg = DeploymentConfig.validate_configs(args)
                 if flag:
-                    cls.parser.error(colored(msg), 'red')
+                    cls.parser.error(colored(msg, 'red'))
                 else:
                     if args.type == 'update':
                         Utility.update_config(config_file, configs)

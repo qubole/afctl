@@ -13,8 +13,8 @@ class ParserHelpers():
         config_dir = Utility.CONSTS['config_dir']
         config_file = Utility.project_config(project_name)
         sub_files = ['.afctl_project', '.gitignore']
-        sub_dirs = [project_name, 'deployments']
-        project_init_file = ['__init__.py']
+        sub_dirs = [project_name, 'deployments', 'migrations', 'plugins', 'tests']
+        project_dirs = ['dags', 'commons']
 
         return {
             'main_dir': main_dir,
@@ -23,7 +23,7 @@ class ParserHelpers():
             'config_file':config_file,
             'sub_files': sub_files,
             'sub_dirs': sub_dirs,
-            'project_init_file': project_init_file
+            'project_dirs': project_dirs
         }
 
 
@@ -44,5 +44,5 @@ class ParserHelpers():
     def init_files(files):
         sub_file = Utility.create_files([files['main_dir']], files['sub_files'])
         dirs = Utility.create_dirs([files['main_dir']], files['sub_dirs'])
-        sub_dir = Utility.create_files([dirs[files['sub_dirs'][0]]], files['project_init_file'])
-        return sub_file, dirs, sub_dir
+        project_dirs = Utility.create_dirs([dirs[files['project_name']]], files['project_dirs'])
+        return sub_file, dirs, project_dirs

@@ -54,7 +54,7 @@ class Parser():
                 os.mkdir(files['main_dir'])
 
             # STEP - 2: create files and dirs
-            sub_file, dirs, sub_dir = ParserHelpers.init_files(files)
+            sub_file, dirs, project_dirs = ParserHelpers.init_files(files)
 
             #STEP - 3: create config file
             subprocess.run(['cp', '{}/plugins/deployments/deployment_config.yml'.format(os.path.dirname(os.path.abspath(__file__))),

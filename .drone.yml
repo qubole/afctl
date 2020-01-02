@@ -1,0 +1,10 @@
+name: default
+
+kind: pipeline
+type: docker
+
+steps:
+- name: runtests
+  image: python3
+  commands:
+    - echo "Executed"

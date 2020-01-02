@@ -27,6 +27,7 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
             file_path = os.path.dirname(os.path.abspath(__file__))
             composer_file = os.path.join(file_path, 'afctl-docker-compose.yml')
             os.system("cp {} {}/deployments/{}-docker-compose.yml".format(composer_file, main_dir, project_name))
+            print("Updating docker compose.")
             Utility.update_config(project_name, {'deployment':{'local':{'compose': "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)}}})
 
         # Change dags directory in volume

@@ -102,25 +102,19 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             if origin is None or origin == '':
                 return True, "Origin is not set for the project. Run 'afctl config global -o <origin>'"
 
-            name = args.n
-            config = config['deployment']['qubole'][name]
-            env = config['env']
-            cluster = config['cluster']
-            token = config['token']
-            branch = subprocess.run(['git', 'symbolic-ref', '--short', 'HEAD'], stdout=subprocess.PIPE).stdout.decode('utf-8')[:-1]
+            params = QuboleUtils.generate_configs(config, args)
+            latest_commit_on_remote = QuboleUtils.fetch_latest_commit(origin, params['branch'])
 
-            latest_commit_on_remote = QuboleUtils.fetch_latest_commit(origin, branch)
             if latest_commit_on_remote is None:
                 return True, "Unable to read latest commit on origin. Please make sure the current branch is present on origin."
 
-            print("Latest commit of {} on origin {} found.".format(branch, origin))
-            print("Deploying commit : {} on QDS".format(latest_commit_on_remote))
+            print("Latest commit of {} on origin {} found.".format(params['branch'], origin))
+            print("Deploying commit : {} on Qubole".format(latest_commit_on_remote))
 
-            qds_command = QuboleUtils.get_git_command(project, origin, branch, latest_commit_on_remote)
-
-            command = QuboleUtils.run_qds_command(env, cluster, token, qds_command)
-            print(command)
-
+            qds_command = QuboleUtils.get_git_command(project, origin, params['branch'], latest_commit_on_remote)
+            command = QuboleUtils.run_qds_command(params['env'], params['cluster'], params['token'], qds_command)
+            if command.status != 'done':
+                return True, "Deployment failed on Qubole"
 
             return False, ""
 

@@ -9,7 +9,7 @@ from termcolor import colored
 class Utility():
 
     CONSTS = {
-        'config_dir': os.path.join(os.path.expanduser("~"), 'afctl_config')
+        'config_dir': os.path.join(os.path.expanduser("~"), '.afctl_config')
     }
 
     @staticmethod
@@ -135,3 +135,16 @@ class Utility():
         with open('{}_dag.py'.format(name), 'w') as file:
             file.write(dag_file)
 
+
+    @staticmethod
+    def is_afctl_project(pwd):
+        try:
+            dirs = pwd.lstrip('/').split('/')
+            for i in range(len(dirs)+1):
+                path = '/'.join(dirs[:i])
+                if os.path.exists(os.path.join('/'+path, '.afctl_project')):
+                    return '/'+path
+            return None
+
+        except Exception as e:
+            raise AfctlUtilsException(e)

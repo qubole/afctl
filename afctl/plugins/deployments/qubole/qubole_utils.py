@@ -32,7 +32,10 @@ git clone --single-branch -b ${branch} ${origin}
 cd ${project}
 source /etc/profile.d/airflow.sh
 yes | cp -rf ${project} $AIRFLOW_HOME/dags/
-rm -rf /tmp/qubole_${latest_commit_on_remote}"""
+rm -rf /tmp/qubole_${latest_commit_on_remote}
+cd $AIRFLOW_HOME
+sudo monit restart webserver
+sudo monit restart scheduler"""
         )
 
         return template.render_unicode(
@@ -71,5 +74,25 @@ rm -rf /tmp/qubole_${latest_commit_on_remote}"""
                         new_conf[k] = v
 
             return new_conf, False, ""
+        except Exception as e:
+            raise AfctlDeploymentException(e)
+
+    @staticmethod
+    def generate_configs(configs, args):
+        try:
+            name = args.n
+            config = configs['deployment']['qubole'][name]
+            env = "{}/api".format(config['env'].rstrip('/'))
+            cluster = config['cluster']
+            token = config['token']
+            branch = subprocess.run(['git', 'symbolic-ref', '--short', 'HEAD'], stdout=subprocess.PIPE).stdout.decode('utf-8')[:-1]
+
+            return{
+                'name': name,
+                'env': env,
+                'cluster': cluster,
+                'token': token,
+                'branch': branch
+            }
         except Exception as e:
             raise AfctlDeploymentException(e)

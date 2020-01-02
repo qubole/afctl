@@ -45,28 +45,23 @@ class Parser():
                 os.mkdir(files['config_dir'])
 
             if os.path.exists(files['main_dir']) and os.path.exists(files['config_file']):
-                cls.parser.error(colored("Project already exists. Please delete entry under /home/afctl_congfis", 'red'))
+                cls.parser.error(colored("Project already exists. Please delete entry under /home/.afctl_congfis", 'red'))
 
             print(colored("Initializing new project...", 'green'))
 
-            # STEP - 1: Create parent dir
+            # New afctl project
             if args.name != '.':
                 os.mkdir(files['main_dir'])
-
-            # STEP - 2: create files and dirs
-            sub_file, dirs, project_dirs = ParserHelpers.init_files(files)
-
-            #STEP - 3: create config file
-            subprocess.run(['cp', '{}/plugins/deployments/deployment_config.yml'.format(os.path.dirname(os.path.abspath(__file__))),
-                            files['config_file']])
-            subprocess.run(['cp', '{}/templates/gitignore.txt'.format(os.path.dirname(os.path.abspath(__file__))),
-                            sub_file['.gitignore']])
-
-            #STEP - 4: Add git origin.
-            ParserHelpers.add_git_origin(files)
-
-            # STEP - 5: Generate files if required by deployments.
-            DeploymentConfig.generate_dirs(files['main_dir'], files['project_name'])
+                ParserHelpers.init_project(files)
+            else:
+                # Initialising project in existing directory
+                project_parent_dir = Utility.is_afctl_project(os.getcwd())
+                if project_parent_dir is None:
+                    # Not an afctl project. Generate all directories.
+                    ParserHelpers.init_project(files)
+                else:
+                    # Since its an afctl project. Just populate the config files.
+                    ParserHelpers.generate_config_file(files)
 
             print(colored("New project initialized successfully.", 'green'))
 

@@ -23,6 +23,7 @@ pip3 install .
 
 ## Requirements
 Python 3.5+
+Docker
 
 ## Usage
 
@@ -41,7 +42,7 @@ afctl <command> -h
 
 #### Initialize a new afctl project. 
 The project is created in your present working directory. Along with this a configuration file with the same name is 
-generated in **/home/afctl_configs** directory.
+generated in **/home/.afctl_configs** directory.
 
 
 ```bash

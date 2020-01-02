@@ -130,9 +130,9 @@ class Utility():
             raise AfctlUtilsException(e)
 
     @staticmethod
-    def generate_dag_template(config_file, name):
-        dag_file = dag_template(name, config_file)
-        with open('{}_dag.py'.format(name), 'w') as file:
+    def generate_dag_template(project_name, name, path):
+        dag_file = dag_template(name, project_name)
+        with open('{}/{}_dag.py'.format(path, name), 'w') as file:
             file.write(dag_file)
 
 

@@ -106,14 +106,28 @@ class Parser():
     def generate(cls, args):
 
         try:
-            config_file = cls.validate_project(None)
-            if config_file is None:
+            project_name = cls.validate_project(None)
+            if project_name is None:
                 cls.parser.error(colored("Invalid project.", 'red'))
 
+            parent_dir = Utility.is_afctl_project(os.getcwd())
             if args.type == "dag":
-                Utility.generate_dag_template(config_file, args.n)
+                path = "{}/{}/dags".format(parent_dir, project_name)
+                if args.m is not None:
+                    path = os.path.join(path, args.m)
+                    if not os.path.exists(path):
+                        cls.parser.error(colored("The specified module does not exists", 'red'))
+                Utility.generate_dag_template(project_name, args.n, path)
 
-            print(colored("Template generated successfully.", 'green'))
+            elif args.type == "module":
+                path = "{}/{}/dags/{}".format(parent_dir, project_name, args.n)
+                test_path = "{}/tests/{}".format(parent_dir, args.n)
+                mod_val = subprocess.call(['mkdir', path])
+                test_val = subprocess.call(['mkdir', test_path])
+                if mod_val != 0 or test_val != 0:
+                    cls.parser.error(colored("Unable to generate.", 'red'))
+
+            print(colored("Generated successfully.", 'green'))
 
         except Exception as e:
             raise AfctlParserException(e)

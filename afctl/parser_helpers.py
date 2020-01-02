@@ -90,3 +90,23 @@ class ParserHelpers():
 
         except Exception as e:
             raise AfctlParserException(e)
+
+
+    @staticmethod
+    def generate_project(args, files):
+        try:
+            if args.name != '.':
+                os.mkdir(files['main_dir'])
+                ParserHelpers.init_project(files)
+            else:
+                # Initialising project in existing directory
+                project_parent_dir = Utility.is_afctl_project(os.getcwd())
+                if project_parent_dir is None:
+                    # Not an afctl project. Generate all directories.
+                    ParserHelpers.init_project(files)
+                else:
+                    # Since its an afctl project. Just populate the config files.
+                    ParserHelpers.generate_config_file(files)
+
+        except Exception as e:
+            raise AfctlParserException(e)

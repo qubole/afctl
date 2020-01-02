@@ -50,18 +50,7 @@ class Parser():
             print(colored("Initializing new project...", 'green'))
 
             # New afctl project
-            if args.name != '.':
-                os.mkdir(files['main_dir'])
-                ParserHelpers.init_project(files)
-            else:
-                # Initialising project in existing directory
-                project_parent_dir = Utility.is_afctl_project(os.getcwd())
-                if project_parent_dir is None:
-                    # Not an afctl project. Generate all directories.
-                    ParserHelpers.init_project(files)
-                else:
-                    # Since its an afctl project. Just populate the config files.
-                    ParserHelpers.generate_config_file(files)
+            ParserHelpers.generate_project(args, files)
 
             print(colored("New project initialized successfully.", 'green'))
 
@@ -200,10 +189,13 @@ class Parser():
             {
                 'func': cls.generate,
                 'parser': 'generate',
-                'help': 'Generators',
+                'help': 'Generators\n'+
+                        '-n : Name of the dag file or the module\n'+
+                        '-m : Name of module where you want to generate a dag file\n',
                 'args': [
-                    ['type', {'choices':['dag']}],
-                    ['-n', {'required':'True'}]
+                    ['type', {'choices':['dag', 'module']}],
+                    ['-n', {'required':'True'}],
+                    ['-m']
                 ]
             }
 

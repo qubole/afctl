@@ -90,6 +90,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
     @classmethod
     def deploy_project(cls, args, config_file):
         try:
+
             if args.n is None:
                 return True, "-n is required. Check usage."
 
@@ -98,6 +99,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
 
             project = config_file
             origin = config['global']['git']['origin']
+            token = config['global']['git']['access-token']
 
             if origin is None or origin == '':
                 return True, "Origin is not set for the project. Run 'afctl config global -o <origin>'"
@@ -105,11 +107,17 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             params = QuboleUtils.generate_configs(config, args)
             latest_commit_on_remote = QuboleUtils.fetch_latest_commit(origin, params['branch'])
 
+            if token is None or token == '':
+                print("No personal access token found. The repository should be public.")
+
             if latest_commit_on_remote is None:
                 return True, "Unable to read latest commit on origin. Please make sure the current branch is present on origin."
 
             print("Latest commit of {} on origin {} found.".format(params['branch'], origin))
             print("Deploying commit : {} on Qubole".format(latest_commit_on_remote))
+
+            if token is not None and token != "":
+                origin = QuboleUtils.create_private_repo_url(origin, token)
 
             qds_command = QuboleUtils.get_git_command(project, origin, params['branch'], latest_commit_on_remote)
             command = QuboleUtils.run_qds_command(params['env'], params['cluster'], params['token'], qds_command)

@@ -34,7 +34,7 @@ class ParserHelpers():
 
 
     @staticmethod
-    def add_git_origin(files):
+    def add_git_config(files):
         try:
             origin = subprocess.run(['git', '--git-dir={}'.format(os.path.join(files['main_dir'], '.git')), 'config',
                                      '--get', 'remote.origin.url'],stdout=subprocess.PIPE)
@@ -46,7 +46,7 @@ class ParserHelpers():
                 print("Updating git origin.")
                 Utility.update_config(files['project_name'], {'global':{'git':{'origin':origin}}})
                 print("Setting origin as : {}".format(origin))
-
+            print(colored("Set personal access token for Github. Run 'afctl config global -t <token>'", 'yellow'))
         except Exception as e:
             raise AfctlParserException(e)
 
@@ -86,7 +86,7 @@ class ParserHelpers():
                             files['config_file']])
 
             DeploymentConfig.generate_dirs(files['main_dir'], files['project_name'])
-            ParserHelpers.add_git_origin(files)
+            ParserHelpers.add_git_config(files)
 
         except Exception as e:
             raise AfctlParserException(e)

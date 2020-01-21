@@ -91,6 +91,7 @@ TYPES:
        Arguments:
            -p : Project
            -o : Set git origin for deployment
+           -t : Set personal access token
    show -  Show the config file on console
        No arguments.
 
@@ -159,7 +160,9 @@ afctl config show
 
 * Prints the configuration file on the console.
 
-
 ### Caution
 Not yet ported for Windows.
+
+#### Credits
+Docker-compose file : https://github.com/puckel/docker-airflow 
 

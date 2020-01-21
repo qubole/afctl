@@ -170,6 +170,7 @@ class Parser():
                         '       Arguments:\n'+
                         '           -p : Project\n'+
                         '           -o : Set git origin for deployment\n'+
+                        '           -t : Set personal access token\n'+
                         '   show -  Show the config file on console\n'+
                         '       No arguments.'
                         ,
@@ -257,10 +258,16 @@ class Parser():
             # Setting global values.
             if args.type == "global":
                 origin = args.o
-                if args.o is None:
+                token = args.t
+                if args.o is None and args.t is None:
                     origin = input("Git origin for deployment : ")
-                if origin != '':
+                    token = input("Personal access token : ")
+
+                if origin != '' and origin is not None:
                     Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
+
+                if token != '' and token is not None:
+                    Utility.update_config(config_file, {'global':{'git':{'access-token':token}}})
 
             # If adding or updating configs.
             elif args.type == 'add' or  args.type == 'update':

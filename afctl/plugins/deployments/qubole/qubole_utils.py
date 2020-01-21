@@ -3,6 +3,7 @@ from afctl.exceptions import AfctlDeploymentException
 from mako.template import Template
 from qds_sdk.qubole import Qubole
 from qds_sdk.commands import ShellCommand
+from urllib.parse import urlparse
 
 class QuboleUtils():
 
@@ -102,5 +103,15 @@ sudo monit restart scheduler"""
                 'token': token,
                 'branch': branch
             }
+        except Exception as e:
+            raise AfctlDeploymentException(e)
+
+    @staticmethod
+    def create_private_repo_url(origin, token):
+        try:
+            url = urlparse(origin)
+            org = url.path.split('/')[1]
+            url = "https://{}:{}@github.com{}".format(org, token, url.path)
+            return url
         except Exception as e:
             raise AfctlDeploymentException(e)

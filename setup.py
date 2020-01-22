@@ -18,6 +18,7 @@ setup(
     author_email="dev@qubole.com",
     description="Python commandline tool to make deployment of Airflow projects easier.",
     long_description=long_description,
+    long_description_content_type='text/markdown',
     keywords="airflow cli deployment",
     packages=find_packages(),
     include_package_data=True,

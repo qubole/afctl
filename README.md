@@ -64,12 +64,12 @@ afctl init .
 The configuration file is used for deployment.
 ```yaml
 global:
-  git:
-    origin:
+-git:
+--origin:
 deployment:
-  qubole:
-  docker-local:
-    compose:
+-qubole:
+--docker-local:
+---compose:
 ```
 <br>
 

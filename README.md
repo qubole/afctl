@@ -169,7 +169,7 @@ afctl config show
 ### Example
 * Qubole
 ```bash
-afctl config add -d qubole -n <name> -e https://api.qubole.com -c <cluster-label> -t <Auth-token>
+afctl config add -d qubole -n <name> -e https://<env>.qubole.com -c <cluster-label> -t <auth-token>
 afctl deploy qubole -n name
 ```
 

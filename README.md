@@ -6,7 +6,6 @@ projects and make development + deployment of projects seamless.
 
 ## Installation
 
-Clone the repository. <br />
 Create a new python virtualenv. You can use the following command. <br />
 ```bash
 python3 -m venv <name>
@@ -16,10 +15,17 @@ Activate your virtualenv<br/>
 source /path_to_venv/bin/activate
 ```
 
+```bash
+pip3 install afctl
+```
+or<br/>
+
+Clone the repository. <br />
 Step into the afctl directory and run <br/>
 ```bash
 pip3 install .
 ```
+
 
 ## Requirements
 Python 3.5+
@@ -159,6 +165,13 @@ afctl config show
 ```
 
 * Prints the configuration file on the console.
+
+### Example
+* Qubole
+```bash
+afctl config add -d qubole -n name -e https://api.qubole.com -c cluster-label -t Auth-token
+afctl deploy qubole -n name
+```
 
 ### Caution
 Not yet ported for Windows.

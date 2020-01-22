@@ -65,7 +65,7 @@ The configuration file is used for deployment.
 ```yaml
 global:
 -git:
--origin:
+--origin:
 deployment:
 -qubole:
 --docker-local:

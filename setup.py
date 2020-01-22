@@ -1,8 +1,12 @@
 from setuptools import setup, find_packages
+import os
 import versioneer
 
 with open('requirements.txt') as f:
     required = f.read().splitlines()
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name="afctl",
@@ -12,6 +16,7 @@ setup(
     author="Qubole",
     author_email="dev@qubole.com",
     description="Python commandline tool to make deployment of Airflow projects easier.",
+    long_description=read('README.md'),
     keywords="airflow cli deployment",
     packages=find_packages(),
     include_package_data=True,

@@ -116,19 +116,19 @@ optional arguments:
 ```
 
 ```bash
-afctl config global -o {origin}
+afctl config global -o <origin>
 ```
 * Will set the git origin for your project.
 * Supports both inline arguments as well as promoting for input.
 
 ```bash
-afctl configs add -d {deployment}
+afctl configs add -d <deployment>
 ```
 * Prompts the user to input connector related values.
 *  Can also provide values as inline arguments.
 
 ```bash
-afctl configs update -d {deployment}
+afctl configs update -d <deployment>
 ```
 
 * Prompts the user to update the values
@@ -155,7 +155,7 @@ optional arguments:
 ```
 
 ```bash
-afctl deploy {deployment} -n {name of deployment}
+afctl deploy <deployment> -n <name of deployment>
 ```
 * Fetches the latest commit in remote origin.
 * Deploys the repository with the last commit as shown.
@@ -169,7 +169,7 @@ afctl config show
 ### Example
 * Qubole
 ```bash
-afctl config add -d qubole -n name -e https://api.qubole.com -c cluster-label -t Auth-token
+afctl config add -d qubole -n <name> -e https://<env>.qubole.com -c <cluster-label> -t <auth-token>
 afctl deploy qubole -n name
 ```
 

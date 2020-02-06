@@ -1,5 +1,6 @@
 from afctl.plugins.deployments.base_deployment_config import BaseDeploymentConfig
 from afctl.exceptions import AfctlDeploymentException
+from afctl.plugins.deployments.docker.afctl_docker_compose import docker_compose_template
 import os
 import yaml
 from afctl.utils import Utility
@@ -24,9 +25,10 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
     @classmethod
     def generate_dirs(cls, main_dir, project_name):
         try:
-            file_path = os.path.dirname(os.path.abspath(__file__))
-            composer_file = os.path.join(file_path, 'afctl-docker-compose.yml')
-            os.system("cp {} {}/deployments/{}-docker-compose.yml".format(composer_file, main_dir, project_name))
+            compose_file = docker_compose_template(project_name)
+            deployment_compose_file = "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)
+            with open(deployment_compose_file, 'w') as file:
+                file.write(compose_file)
             print("Updating docker compose.")
             Utility.update_config(project_name, {'deployment':{'local':{'compose': "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)}}})
 

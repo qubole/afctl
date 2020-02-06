@@ -13,12 +13,11 @@ default_args = {
 # 'email': ,
 # 'email_on_failure': ,
 # 'email_on_retry': ,
-# 'retries': 0,
-# schedule_interval=
+# 'retries': 0
 
 }
 
-dag = DAG(dag_id=${name}, default_args=default_args)
+dag = DAG(dag_id=${name}, default_args=default_args, schedule_interval='@once')
 
     
 """

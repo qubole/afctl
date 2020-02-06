@@ -17,7 +17,10 @@ class Utility():
         try:
             dirs = {}
             for dir1, dir2 in itertools.product(parent, child):
-                os.mkdir(os.path.join(dir1, dir2))
+                if not os.path.exists(os.path.join(dir1, dir2)):
+                    os.mkdir(os.path.join(dir1, dir2))
+                else:
+                    print("{} already exists. Skipping.".format(dir2))
                 dirs[dir2] = os.path.join(dir1, dir2)
             return dirs
         except Exception as e:

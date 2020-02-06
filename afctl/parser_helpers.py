@@ -95,9 +95,14 @@ class ParserHelpers():
     @staticmethod
     def generate_project(args, files):
         try:
+            flag = False
             if args.name != '.':
-                os.mkdir(files['main_dir'])
-                ParserHelpers.init_project(files)
+                if not os.path.exists(files['main_dir']):
+                    os.mkdir(files['main_dir'])
+                    ParserHelpers.init_project(files)
+                else:
+                    print("Directory already exists.")
+                    return True
             else:
                 # Initialising project in existing directory
                 project_parent_dir = Utility.is_afctl_project(os.getcwd())
@@ -108,5 +113,6 @@ class ParserHelpers():
                     # Since its an afctl project. Just populate the config files.
                     ParserHelpers.generate_config_file(files)
 
+            return flag
         except Exception as e:
             raise AfctlParserException(e)

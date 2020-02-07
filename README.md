@@ -74,7 +74,7 @@ global:
 --origin:
 deployment:
 -qubole:
---docker-local:
+--local:
 ---compose:
 ```
 <br>
@@ -141,18 +141,25 @@ TYPES:
    [qubole] - Deploy your project to QDS.
        Arguments:
            -n : Name of the deployment
-   [docker-local] - Deploy your project to local docker.
+   [local] - Deploy your project to local docker.
        Arguments:
            -d : To run in daemon mode
 
 positional arguments:
-  {qubole,docker-local}
+  {qubole,local}
 
 optional arguments:
   -h, --help            show this help message and exit
   -d
   -n N
 ```
+
+* To Deploy on local docker
+```bash
+afctl deploy local
+```
+
+* To deploy on remote machine
 
 ```bash
 afctl deploy <deployment> -n <name of deployment>

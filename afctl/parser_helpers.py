@@ -95,7 +95,7 @@ class ParserHelpers():
     @staticmethod
     def generate_project(args, files):
         try:
-            flag = False
+
             if args.name != '.':
                 if not os.path.exists(files['main_dir']):
                     os.mkdir(files['main_dir'])
@@ -113,6 +113,6 @@ class ParserHelpers():
                     # Since its an afctl project. Just populate the config files.
                     ParserHelpers.generate_config_file(files)
 
-            return flag
+            return False
         except Exception as e:
             raise AfctlParserException(e)

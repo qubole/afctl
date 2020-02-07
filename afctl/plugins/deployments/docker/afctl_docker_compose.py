@@ -1,3 +1,9 @@
+from mako.template import Template
+
+def docker_compose_template(path):
+    template = Template(
+
+"""
 version: '2.1'
 services:
   redis:
@@ -30,9 +36,9 @@ services:
       # - POSTGRES_DB=airflow
       # - REDIS_PASSWORD=redispass
     volumes:
-      - ./dags:/usr/local/airflow/dags
+      - ../${path}/dags:/usr/local/airflow/dags
       # Uncomment to include custom plugins
-      # - ./plugins:/usr/local/airflow/plugins
+      # - ../plugins:/usr/local/airflow/plugins
     ports:
       - "8080:8080"
     command: webserver
@@ -60,9 +66,9 @@ services:
     depends_on:
       - webserver
     volumes:
-      - ./dags:/usr/local/airflow/dags
+      - ../${path}/dags:/usr/local/airflow/dags
       # Uncomment to include custom plugins
-      # - ./plugins:/usr/local/airflow/plugins
+      # - ../plugins:/usr/local/airflow/plugins
     environment:
       - LOAD_EX=n
       - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
@@ -79,9 +85,9 @@ services:
     depends_on:
       - scheduler
     volumes:
-      - ./dags:/usr/local/airflow/dags
+      - ../${path}/dags:/usr/local/airflow/dags
       # Uncomment to include custom plugins
-      # - ./plugins:/usr/local/airflow/plugins
+      # - ../plugins:/usr/local/airflow/plugins
     environment:
       - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
       - EXECUTOR=Celery
@@ -90,3 +96,7 @@ services:
       # - POSTGRES_DB=airflow
       # - REDIS_PASSWORD=redispass
     command: worker
+"""
+    )
+
+    return template.render_unicode(path=path)

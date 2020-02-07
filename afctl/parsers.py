@@ -50,9 +50,12 @@ class Parser():
             print(colored("Initializing new project...", 'green'))
 
             # New afctl project
-            ParserHelpers.generate_project(args, files)
+            flag = ParserHelpers.generate_project(args, files)
 
-            print(colored("New project initialized successfully.", 'green'))
+            if flag:
+                print(colored("Unable to initialize project.", 'red'))
+            else:
+                print(colored("New project initialized successfully.", 'green'))
 
         except Exception as e:
             raise AfctlParserException(e)

@@ -113,6 +113,9 @@ class ParserHelpers():
                     # Since its an afctl project. Just populate the config files.
                     ParserHelpers.generate_config_file(files)
 
+            if args.v != None:
+                Utility.update_config(files['project_name'], {'global': {'airflow_version': args.v}})
+
             return False
         except Exception as e:
             raise AfctlParserException(e)

@@ -145,7 +145,8 @@ class Parser():
                 'parser': 'init',
                 'help': 'Create a new Airflow project.',
                 'args': [
-                    ['name', {'help':'Name of your airflow project'}]
+                    ['name', {'help':'Name of your airflow project'}],
+                    ['-v', {'help': 'Airflow version of your project'}]
                 ]
             },
 
@@ -185,7 +186,8 @@ class Parser():
                     ['-n'],
                     ['-e'],
                     ['-c'],
-                    ['-t']
+                    ['-t'],
+                    ['-v']
                 ]
 
             },
@@ -262,15 +264,20 @@ class Parser():
             if args.type == "global":
                 origin = args.o
                 token = args.t
-                if args.o is None and args.t is None:
+                version = args.v
+                if args.o is None and args.t is None and args.v is None:
                     origin = input("Git origin for deployment : ")
                     token = input("Personal access token : ")
+                    version = input("Input airflow version : ")
 
                 if origin != '' and origin is not None:
                     Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
 
                 if token != '' and token is not None:
                     Utility.update_config(config_file, {'global':{'git':{'access-token':token}}})
+
+                if version != '' and version is not None:
+                    Utility.update_config(config_file, {'global': {'airflow_version': version}})
 
             # If adding or updating configs.
             elif args.type == 'add' or  args.type == 'update':

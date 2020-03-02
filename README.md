@@ -1,6 +1,6 @@
 # afctl
 
-The proposed CLI tool is being authored to make creating and deployment of airflow projects faster and smoother. 
+The proposed CLI tool is authored to make creating and deployment of airflow projects faster and smoother. 
 As of now, there is no tool out there that can empower the user to create a boilerplate code structure for airflow 
 projects and make development + deployment of projects seamless.
 
@@ -20,16 +20,16 @@ pip3 install afctl
 ```
 or<br/>
 
-Clone the repository. <br />
-Step into the afctl directory and run <br/>
+Clone this repository. <br />
+Move into the repository and run <br/>
 ```bash
 pip3 install .
 ```
 
 
 ## Requirements
-Python 3.5+
-Docker
+* Python 3.5+
+* Docker
 
 ## Usage
 
@@ -46,7 +46,7 @@ afctl <command> -h
 ```
 <br>
 
-#### Initialize a new afctl project. 
+## Initialize a new afctl project. 
 The project is created in your present working directory. Along with this a configuration file with the same name is 
 generated in **/home/.afctl_configs** directory.
 
@@ -58,20 +58,23 @@ afctl init “name of the project”
 * Creates a new project directory.
 * Creates a config file in the home directory
 
+If you already have a git repository and want to turn it into an afctl project.
+Run the following command :-
 ```bash
 afctl init .
 ```
 * Initialize the current directory as a project
-* If the directory is already a git repository then the global configs will get automatically set.
 <br>
 
-#### Manage configurations
+## Manage configurations
 
-The configuration file is used for deployment.
+The configuration file is used for deployment contains the following information.
 ```yaml
 global:
+-airflow_version:
 -git:
 --origin:
+--access-token:
 deployment:
 -qubole:
 --local:
@@ -79,105 +82,148 @@ deployment:
 ```
 <br>
 
+* `airflow_version` can be added to the project when you initialize the project.
+```bash
+afctl init <name> -v <version>
 ```
-TYPES:
-   add - add a config for your deployment.
-   update - update an existing config for your deployment.
-       Arguments:
-           -d : Deployment Type
-           -p : Project
-            [ Qubole ]
-               -n : name of deployment
-               -e : name of environment
-               -c : cluster label
-               -t : auth token
-            [ docker-local ]
-               Cannot add/update configs.
-   global
-       Arguments:
-           -p : Project
-           -o : Set git origin for deployment
-           -t : Set personal access token
-   show -  Show the config file on console
-       No arguments.
 
-positional arguments:
-  {add,update,show,global}
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -d {qubole}
-  -o O
-  -p P
-  -n N
-  -e E
-  -c C
-  -t T
-```
+* `global configs (airflow_version, origin, access-token)` can all be added/ updated with the following command :
 
 ```bash
-afctl config global -o <origin>
+afctl config global -o <git-origin> -t <access-token> -v <airflow_version>
+``` 
+
+## Deploy project locally
+* Initialize a new afctl project
+```bash
+afctl init project_demo
 ```
-* Will set the git origin for your project.
-* Supports both inline arguments as well as promoting for input.
+* The following directory structure will be generated
+```bash
+.
+├── deployments
+│   └── project_demo-docker-compose.yml
+├── migrations
+├── plugins
+├── project_demo
+│   ├── commons
+│   └── dags
+├── requirements.txt
+└── tests
+```
+You can add python packages that will be required by your dags in `requirements.txt`. They will automatically get
+installed.
+* Add a new module in the project.
+```bash
+afctl generate module -n <name of the module>
+```
+
+The following directory structure will be generated :
 
 ```bash
-afctl configs add -d <deployment>
+afctl generate module -n first_module
+afctl generate module -n second_module
+
+.
+├── deployments
+│   └── project_demo-docker-compose.yml
+├── migrations
+├── plugins
+├── project_demo
+│   ├── commons
+│   └── dags
+│       ├── first_module
+│       └── second_module
+├── requirements.txt
+└── tests
+    ├── first_module
+    └── second_module
+
 ```
-* Prompts the user to input connector related values.
-*  Can also provide values as inline arguments.
+
+* You can generate dags using the following command :
 
 ```bash
-afctl configs update -d <deployment>
+afctl generate dag -n <name of dag> -m <name of module>
 ```
 
-* Prompts the user to update the values
-* Can also provide inline arguments.
-
-#### Deploy projects
+The following directory structure will be generate :
 
 ```bash
-TYPES:
-   [qubole] - Deploy your project to QDS.
-       Arguments:
-           -n : Name of the deployment
-   [local] - Deploy your project to local docker.
-       Arguments:
-           -d : To run in daemon mode
+afctl generate dag -n new -m first_module
 
-positional arguments:
-  {qubole,local}
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -d
-  -n N
+.
+├── deployments
+│   └── project_demo-docker-compose.yml
+├── migrations
+├── plugins
+├── project_demo
+│   ├── commons
+│   └── dags
+│       ├── first_module
+│       │   └── new_dag.py
+│       └── second_module
+├── requirements.txt
+└── tests
+    ├── first_module
+    └── second_module
 ```
 
-* To Deploy on local docker
+The dag file will look like this :
+
+```python
+from airflow import DAG
+from datetime import datetime, timedelta
+
+default_args = {
+'owner': 'project_demo',
+# 'depends_on_past': ,
+# 'start_date': ,
+# 'email': ,
+# 'email_on_failure': ,
+# 'email_on_retry': ,
+# 'retries': 0
+
+}
+
+dag = DAG(dag_id='new', default_args=default_args, schedule_interval='@once')
+```
+
+* To deploy your project, run the following command (make sure docker is running) :
+
 ```bash
 afctl deploy local
 ```
-
-* To deploy on remote machine
-
+If you do not want to see the logs, you can run 
 ```bash
-afctl deploy <deployment> -n <name of deployment>
+afctl deploy local -d
 ```
-* Fetches the latest commit in remote origin.
-* Deploys the repository with the last commit as shown.
+This will run it in detached mode and won't print the logs on the console.
 
+* You can access your airflow webserver on browser at `localhost:8080`
+
+## Deploy project on Qubole
+
+* Initialize a new project and add git-origin and access-token (if want to keep the project as private repo
+on Github) to the configs.
+* Push the project once completed to Github.
+* Deploying to Qubole will require adding deployment configurations.
+```bash
+afctl config add -d qubole -n <name of deployment> -e <env> -c <cluster-label> -t <auth-token>
+```
+This command will modify your config file. You can see your config file with the following command :
 ```bash
 afctl config show
 ```
 
-* Prints the configuration file on the console.
-
-### Example
-* Qubole
+For example - 
 ```bash
-afctl config add -d qubole -n <name> -e https://<env>.qubole.com -c <cluster-label> -t <auth-token>
-afctl deploy qubole -n name
+afctl config add -d qubole -n demo -e https://api.qubole.com -c airflow_1102 -t khd34djs3
+```
+
+* To deploy run the following command
+```bash
+afctl deploy qubole -n <name>
 ```
 
 ### Caution

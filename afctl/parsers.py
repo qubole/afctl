@@ -146,7 +146,7 @@ class Parser():
                 'help': 'Create a new Airflow project.',
                 'args': [
                     ['name', {'help':'Name of your airflow project'}],
-                    ['-v', {'help': 'Airflow version of your project'}]
+                    ['-v', {'help': 'Airflow version for your project'}]
                 ]
             },
 

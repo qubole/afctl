@@ -9,6 +9,9 @@ projects and make development + deployment of projects seamless.
 * Docker
 
 ## Getting Started
+### The following video also contains all the steps of deploying project using afctl - </br>
+https://www.youtube.com/watch?v=A4rcZDGtJME&feature=youtu.be
+
 ### 1. Installation
 
 Create a new python virtualenv. You can use the following command. <br />
@@ -23,6 +26,7 @@ source /path_to_venv/bin/activate
 ```bash
 pip3 install afctl
 ```
+
 
 ### 2. Initialize a new afctl project. 
 The project is created in your present working directory. Along with this a configuration file with the same name is 

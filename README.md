@@ -8,7 +8,8 @@ projects and make development + deployment of projects seamless.
 * Python 3.5+
 * Docker
 
-## Installation
+## Getting Started
+### 1. Installation
 
 Create a new python virtualenv. You can use the following command. <br />
 ```bash
@@ -23,7 +24,7 @@ source /path_to_venv/bin/activate
 pip3 install afctl
 ```
 
-## Initialize a new afctl project. 
+### 2. Initialize a new afctl project. 
 The project is created in your present working directory. Along with this a configuration file with the same name is 
 generated in **/home/.afctl_configs** directory.
 
@@ -31,20 +32,7 @@ generated in **/home/.afctl_configs** directory.
 ```bash
 afctl init <name of the project>
 ```
-
-* Creates a new project directory.
-* Creates a config file in the home directory
-
-If you already have a git repository and want to turn it into an afctl project.
-Run the following command :-
-```bash
-afctl init .
-```
-* Initialize the current directory as a project
-<br>
-
-## Deploy project locally
-* Initialize a new afctl project
+Eg.
 ```bash
 afctl init project_demo
 ```
@@ -61,9 +49,16 @@ afctl init project_demo
 ├── requirements.txt
 └── tests
 ```
-You can add python packages that will be required by your dags in `requirements.txt`. They will automatically get
-installed.
-* Add a new module in the project.
+
+If you already have a git repository and want to turn it into an afctl project.
+Run the following command :-
+```bash
+afctl init .
+```
+<br>
+
+### 3. Add a new module in the project.
+
 ```bash
 afctl generate module -n <name of the module>
 ```
@@ -91,8 +86,7 @@ afctl generate module -n second_module
 
 ```
 
-* You can generate dags using the following command :
-
+### 4. Generate dag
 ```bash
 afctl generate dag -n <name of dag> -m <name of module>
 ```
@@ -139,11 +133,17 @@ default_args = {
 dag = DAG(dag_id='new', default_args=default_args, schedule_interval='@once')
 ```
 
+### 3. Deploy project locally
+
+You can add python packages that will be required by your dags in `requirements.txt`. They will automatically get
+installed.
+
 * To deploy your project, run the following command (make sure docker is running) :
 
 ```bash
 afctl deploy local
 ```
+
 If you do not want to see the logs, you can run 
 ```bash
 afctl deploy local -d
@@ -154,8 +154,8 @@ This will run it in detached mode and won't print the logs on the console.
 
 ## Deploy project on production 
 
-* Here we will be deploying our project to Qubole.
-* Initialize a new project and add git-origin and access-token (if want to keep the project as private repo
+* Here we will be deploying our project to **Qubole**. Sign up at us.qubole.com.
+* add git-origin and access-token (if want to keep the project as private repo
 on Github) to the configs. [See how](#manage-configurations)
 * Push the project once completed to Github.
 * Deploying to Qubole will require adding deployment configurations.

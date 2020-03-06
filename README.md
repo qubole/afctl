@@ -152,7 +152,7 @@ This will run it in detached mode and won't print the logs on the console.
 
 * You can access your airflow webserver on browser at `localhost:8080`
 
-### 6. Deploy project on production 
+### 6. Deploy project on production
 
 * Here we will be deploying our project to **Qubole**. Sign up at us.qubole.com.
 * add git-origin and access-token (if want to keep the project as private repo
@@ -199,7 +199,7 @@ deployment:
 afctl init <name> -v <version>
 ```
 
-* `global configs (airflow_version, origin, access-token)` can all be added/ updated with the following command :
+* global configs (airflow_version, origin, access-token) can all be added/ updated with the following command :
 
 ```bash
 afctl config global -o <git-origin> -t <access-token> -v <airflow_version>

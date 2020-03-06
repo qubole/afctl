@@ -133,7 +133,7 @@ default_args = {
 dag = DAG(dag_id='new', default_args=default_args, schedule_interval='@once')
 ```
 
-### 3. Deploy project locally
+### 5. Deploy project locally
 
 You can add python packages that will be required by your dags in `requirements.txt`. They will automatically get
 installed.
@@ -152,7 +152,7 @@ This will run it in detached mode and won't print the logs on the console.
 
 * You can access your airflow webserver on browser at `localhost:8080`
 
-## Deploy project on production 
+### 6. Deploy project on production 
 
 * Here we will be deploying our project to **Qubole**. Sign up at us.qubole.com.
 * add git-origin and access-token (if want to keep the project as private repo

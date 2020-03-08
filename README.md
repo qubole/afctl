@@ -9,8 +9,6 @@ projects and make development + deployment of projects seamless.
 * Docker
 
 ## Getting Started
-### The following video also contains all the steps of deploying project using afctl - </br>
-https://www.youtube.com/watch?v=A4rcZDGtJME&feature=youtu.be
 
 ### 1. Installation
 
@@ -181,6 +179,9 @@ afctl config add -d qubole -n demo -e https://api.qubole.com -c airflow_1102 -t 
 ```bash
 afctl deploy qubole -n <name>
 ```
+
+### The following video also contains all the steps of deploying project using afctl - </br>
+https://www.youtube.com/watch?v=A4rcZDGtJME&feature=youtu.be
 
 ## Manage configurations
 

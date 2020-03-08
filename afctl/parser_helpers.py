@@ -15,7 +15,7 @@ class ParserHelpers():
             project_name = os.path.basename(main_dir)
             config_dir = Utility.CONSTS['config_dir']
             config_file = Utility.project_config(project_name)
-            sub_files = ['.afctl_project', '.gitignore']
+            sub_files = ['.afctl_project', '.gitignore', 'requirements.txt']
             sub_dirs = [project_name, 'deployments', 'migrations', 'plugins', 'tests']
             project_dirs = ['dags', 'commons']
 
@@ -112,6 +112,9 @@ class ParserHelpers():
                 else:
                     # Since its an afctl project. Just populate the config files.
                     ParserHelpers.generate_config_file(files)
+
+            if args.v != None:
+                Utility.update_config(files['project_name'], {'global': {'airflow_version': args.v}})
 
             return False
         except Exception as e:

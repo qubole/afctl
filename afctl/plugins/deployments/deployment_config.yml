@@ -1,4 +1,5 @@
 global:
+  airflow_version:
   git:
     origin:
     access-token:

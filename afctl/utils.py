@@ -32,7 +32,10 @@ class Utility():
         try:
             files = {}
             for dir1, dir2 in itertools.product(parent, child):
-                subprocess.run(['touch', os.path.join(dir1, dir2)])
+                if not os.path.exists(os.path.join(dir1, dir2)):
+                    subprocess.run(['touch', os.path.join(dir1, dir2)])
+                else:
+                    print("{} already exists. Skipping.".format(dir2))
                 files[dir2] = os.path.join(dir1, dir2)
             return files
         except Exception as e:

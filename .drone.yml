@@ -7,4 +7,4 @@ steps:
 - name: runtests
   image: python:3
   commands:
-    - echo "Executed"
+    - pytest

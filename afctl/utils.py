@@ -104,7 +104,7 @@ class Utility():
         for i in range(len(dirs)+1):
             path = '/'.join(dirs[:i])
             if os.path.exists(os.path.join('/'+path, '.afctl_project')):
-                return dirs[i-1]
+                return dirs[i-1], '/'+path
         return None
 
     @staticmethod
@@ -117,7 +117,6 @@ class Utility():
 
             with open(path) as file:
                 crawler = yaml.full_load(file)
-
 
             obj = crawler
             for k in config_parents[:-1]:
@@ -143,7 +142,7 @@ class Utility():
 
 
     @staticmethod
-    def is_afctl_project(pwd):
+    def afctl_project_path(pwd):
         try:
             dirs = pwd.lstrip('/').split('/')
             for i in range(len(dirs)+1):

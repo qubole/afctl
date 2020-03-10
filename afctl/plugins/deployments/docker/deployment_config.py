@@ -26,6 +26,7 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
     def generate_dirs(cls, main_dir, project_name):
         try:
             compose_file = docker_compose_template(project_name)
+
             deployment_compose_file = "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)
             with open(deployment_compose_file, 'w') as file:
                 file.write(compose_file)

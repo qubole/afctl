@@ -13,11 +13,6 @@ class DeploymentConfig(BaseDeploymentConfig):
                      DockerDeploymentConfig.DEPLOY_PARSER_USAGE
 
     @classmethod
-    def generate_dirs(cls, main_dir, project_name):
-        QuboleDeploymentConfig.generate_dirs(main_dir, project_name)
-        DockerDeploymentConfig.generate_dirs(main_dir, project_name )
-
-    @classmethod
     def validate_configs(cls, args):
         try:
 
@@ -29,14 +24,15 @@ class DeploymentConfig(BaseDeploymentConfig):
 
 
     @classmethod
-    def deploy_project(cls, args, config_file):
+    def deploy_project(cls, args, project_name, project_path):
         try:
 
             if args.type == "local":
-                return DockerDeploymentConfig.deploy_project(args, config_file)
+                DockerDeploymentConfig.generate_dirs(project_path, project_name)
+                return DockerDeploymentConfig.deploy_project(args, project_name)
 
             if args.type == "qubole":
-                return QuboleDeploymentConfig.deploy_project(args, config_file)
+                return QuboleDeploymentConfig.deploy_project(args, project_name)
 
         except Exception as e:
             raise AfctlDeploymentException(e)

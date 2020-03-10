@@ -38,8 +38,7 @@ class Parser():
     @classmethod
     def init(cls, args):
         try:
-
-            files = ParserHelpers.init_file_name(args.name)
+            files = ParserHelpers.get_project_file_names(args.name)
 
             if not os.path.exists(files['config_dir']):
                 os.mkdir(files['config_dir'])
@@ -74,12 +73,12 @@ class Parser():
     @classmethod
     def config(cls, args):
         try:
-            config_file = cls.validate_project(args.p)
+            project_name, project_path = cls.validate_project()
 
-            if config_file is None:
+            if project_name is None:
                 cls.parser.error(colored("Invalid project.", 'red'))
 
-            cls.act_on_configs(args, config_file)
+            cls.act_on_configs(args, project_name)
 
         except Exception as e:
             raise AfctlParserException(e)
@@ -89,11 +88,11 @@ class Parser():
     def deploy(cls, args):
         try:
             # args.p will always be None
-            config_file = cls.validate_project(None)
-            if config_file is None:
+            project_name, project_path = cls.validate_project()
+            if project_name is None:
                 cls.parser.error(colored("Invalid project.", 'red'))
 
-            flag, msg = DeploymentConfig.deploy_project(args, config_file)
+            flag, msg = DeploymentConfig.deploy_project(args, project_name, project_path)
 
             if flag:
                 print(colored("Deployment failed. See usage. Run 'afctl deploy -h'", 'yellow'))
@@ -109,13 +108,12 @@ class Parser():
     def generate(cls, args):
 
         try:
-            project_name = cls.validate_project(None)
+            project_name, project_path = cls.validate_project()
             if project_name is None:
                 cls.parser.error(colored("Invalid project.", 'red'))
 
-            parent_dir = Utility.is_afctl_project(os.getcwd())
             if args.type == "dag":
-                path = "{}/{}/dags".format(parent_dir, project_name)
+                path = "{}/{}/dags".format(project_path, project_name)
                 if args.m is not None:
                     path = os.path.join(path, args.m)
                     if not os.path.exists(path):
@@ -123,8 +121,8 @@ class Parser():
                 Utility.generate_dag_template(project_name, args.n, path)
 
             elif args.type == "module":
-                path = "{}/{}/dags/{}".format(parent_dir, project_name, args.n)
-                test_path = "{}/tests/{}".format(parent_dir, args.n)
+                path = "{}/{}/dags/{}".format(project_path, project_name, args.n)
+                test_path = "{}/tests/{}".format(project_path, args.n)
                 mod_val = subprocess.call(['mkdir', path])
                 test_val = subprocess.call(['mkdir', test_path])
                 if mod_val != 0 or test_val != 0:
@@ -224,34 +222,21 @@ class Parser():
 
 
     @classmethod
-    def validate_project(cls, args):
+    def validate_project(cls):
         try:
-            # Check if -p <arg> is a project or if the pwd is a project.
-            config_file = None
-
-            # if -p is present
-            if args is not None:
-                # -p <arg> does not have a config file.
-                if not os.path.exists(Utility.project_config(args)):
-                    cls.parser.error(colored("{} is not an afctl project. Config file does not exists".format(args), 'red'))
-                else:
-                    # -p <arg> has a config file.
-                    config_file = args
-
-            # -p <arg> is not present so lets check pwd
+            project_name = None
+            pwd = os.getcwd()
+            # If any parent of pwd contains .afctl_project. If so then it should be the project.
+            project_name, project_path = Utility.find_project(pwd)
+            if project_name is None:
+                # Could not find .afctl_project
+                cls.parser.error(colored("{} is not an afctl project.".format(pwd), 'red'))
             else:
-                pwd = os.getcwd()
-                # If any parent of pwd contains .afctl_project. If so then it should be the project.
-                config_file = Utility.find_project(pwd)
-                if config_file is None:
-                    # Could not find .afctl_project
-                    cls.parser.error(colored("{} is not an afctl project.".format(pwd), 'red'))
-                else:
-                    # Check is the dir containing .afctl_project has a config file
-                    if not os.path.exists(Utility.project_config(config_file)):
-                        cls.parser.error(colored("Config file does not exists for {}".format(config_file), 'red'))
+                # Check is the dir containing .afctl_project has a config file
+                if not os.path.exists(Utility.project_config(project_name)):
+                    cls.parser.error(colored("Config file does not exists for {}".format(project_name), 'red'))
 
-            return config_file
+            return project_name, project_path
         except Exception as e:
             raise AfctlParserException(e)
 

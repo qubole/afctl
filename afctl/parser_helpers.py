@@ -2,7 +2,6 @@ from afctl.utils import Utility
 import os
 import subprocess
 from termcolor import colored
-from afctl.plugins.deployments.deployment_config import DeploymentConfig
 from afctl.exceptions import AfctlParserException
 
 class ParserHelpers():

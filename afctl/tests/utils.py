@@ -2,6 +2,9 @@ import os
 import subprocess
 import itertools
 
+PROJECT_NAME = 'test_project'
+PROJECT_CONFIG_DIR = os.path.join(os.path.expanduser("~"), '.afctl_config')
+
 def clean_up(project_name, config_dir):
     if os.path.exists(project_name):
         subprocess.run(['rm', '-rf', project_name])

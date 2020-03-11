@@ -8,7 +8,8 @@ class TestLocalDeployment:
 
     @pytest.fixture(scope='function')
     def create_project(self):
-        clean_up(PROJECT_NAME, PROJECT_CONFIG_DIR)
+        clean_up(PROJECT_NAME)
+        clean_up(PROJECT_CONFIG_DIR)
         main_dir = os.path.join('/tmp', PROJECT_NAME)
         subprocess.run(['mkdir', main_dir])
         subprocess.run(['mkdir', PROJECT_CONFIG_DIR])
@@ -30,7 +31,8 @@ deployment:
             file.write(config_file_content)
 
         yield main_dir
-        clean_up(main_dir, PROJECT_CONFIG_DIR)
+        clean_up(PROJECT_NAME)
+        clean_up(PROJECT_CONFIG_DIR)
 
     def test_docker_compose_generation(self, create_project):
         DockerDeploymentConfig.generate_dirs(create_project, PROJECT_NAME)

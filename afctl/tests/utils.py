@@ -15,12 +15,9 @@ class DummyArgParse:
         self.v = version
 
 
-def clean_up(project_name, config_dir):
-    if os.path.exists(project_name):
-        subprocess.run(['rm', '-rf', project_name])
-
-    if os.path.exists(config_dir):
-        subprocess.run(['rm', '-rf', config_dir])
+def clean_up(project_file):
+    if os.path.exists(project_file):
+        subprocess.run(['rm', '-rf', project_file])
 
 
 def check_paths(parent, child):
@@ -33,5 +30,4 @@ def check_paths(parent, child):
 def create_path_and_clean(parent, child):
     for dir1, dir2 in itertools.product(parent, child):
         dir_path = os.path.join(dir1, dir2)
-        if os.path.exists(dir_path):
-            subprocess.run(['rm', '-rf', dir_path])
+        clean_up(dir_path)

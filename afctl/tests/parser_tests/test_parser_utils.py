@@ -1,7 +1,7 @@
 from afctl.utils import Utility
 import pytest
-import os
-from afctl.tests.utils import create_path_and_clean, PROJECT_CONFIG_DIR
+import os, subprocess
+from afctl.tests.utils import create_path_and_clean, PROJECT_NAME, PROJECT_CONFIG_DIR, clean_up
 
 class TestUtils:
 
@@ -13,6 +13,7 @@ class TestUtils:
         yield
         create_path_and_clean(parent, child)
 
+    # create_dirs
     def test_create_dir(self, clean_tmp_dir):
         parent = ['/tmp']
         child = ['one', 'two', 'three']
@@ -24,7 +25,7 @@ class TestUtils:
         assert dirs['three'] == '/tmp/three'
         assert os.path.exists(dirs['three']) is True
 
-
+    # create_files
     def test_create_files(self, clean_tmp_dir):
         parent = ['/tmp']
         child = ['one', 'two', 'three']
@@ -36,13 +37,14 @@ class TestUtils:
         assert dirs['three'] == '/tmp/three'
         assert os.path.exists(dirs['three']) is True
 
+    # project_config
     def test_return_project_config_file(self):
         project = "test_project"
         expected_path = os.path.join(PROJECT_CONFIG_DIR, project)+".yml"
         path = Utility.project_config(project)
         assert path == expected_path
 
-
+    # generate_dag_template
     def test_generate_dag_template(self):
         project_name = "tes_project"
         path = "/tmp"
@@ -72,3 +74,31 @@ dag = DAG(dag_id='test', default_args=default_args, schedule_interval='@once')
         current_output = current_output.replace(" ", "")
         assert expected_output == current_output
 
+    @pytest.fixture(scope='function')
+    def create_project(self):
+        path = '/tmp/one/two/three'
+        subprocess.run(['mkdir', '-p', path])
+        file_path = '/tmp/one/two/.afctl_project'
+        subprocess.run(['touch', file_path])
+        yield
+        subprocess.run(['rm', '-rf', path])
+
+    # find_project
+    def test_find_project(self, create_project):
+        path = '/tmp/one/two/three'
+        project = Utility.find_project(path)
+        assert project[0] == 'two'
+        assert project[1] == '/tmp/one/two'
+
+
+    @pytest.fixture(scope='function')
+    def create_config_file(self):
+        subprocess.run(['mkdir', PROJECT_CONFIG_DIR])
+        subprocess.run(['touch', os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME)+'.yml'])
+        yield
+        clean_up(PROJECT_CONFIG_DIR)
+
+
+    # add_configs update_config
+    def test_add_and_update_configs(self, create_config_file):
+        pass

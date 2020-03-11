@@ -103,7 +103,7 @@ class ParserHelpers():
                     return True
             else:
                 # Initialising project in existing directory
-                project_parent_dir = Utility.afctl_project_path(os.getcwd())
+                project_parent_dir = Utility.find_project(os.getcwd())
                 if project_parent_dir is None:
                     # Not an afctl project. Generate all directories.
                     ParserHelpers.generate_all(files)

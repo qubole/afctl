@@ -139,17 +139,3 @@ class Utility():
         dag_file = dag_template(name, project_name)
         with open('{}/{}_dag.py'.format(path, name), 'w') as file:
             file.write(dag_file)
-
-
-    @staticmethod
-    def afctl_project_path(pwd):
-        try:
-            dirs = pwd.lstrip('/').split('/')
-            for i in range(len(dirs)+1):
-                path = '/'.join(dirs[:i])
-                if os.path.exists(os.path.join('/'+path, '.afctl_project')):
-                    return '/'+path
-            return None
-
-        except Exception as e:
-            raise AfctlUtilsException(e)

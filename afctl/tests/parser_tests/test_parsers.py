@@ -7,10 +7,12 @@ class TestParser:
 
     @pytest.fixture(scope='module')
     def create_parser(self):
-        clean_up(PROJECT_NAME, PROJECT_CONFIG_DIR)
+        clean_up(PROJECT_NAME)
+        clean_up(PROJECT_CONFIG_DIR)
         parser = Parser.setup_parser()
         yield parser
-        clean_up(PROJECT_NAME, PROJECT_CONFIG_DIR)
+        clean_up(PROJECT_NAME)
+        clean_up(PROJECT_CONFIG_DIR)
 
 
     def test_init(self, create_parser):
@@ -31,7 +33,7 @@ class TestParser:
         assert check_paths([PROJECT_NAME], ['dummy']) is False
 
 
-    def test_configs(self, create_parser):
+    def test_global_configs(self, create_parser):
         args = DummyArgParse(type="global", origin="new_origin", token="new_token", version="1.10.0")
         Parser.act_on_configs(args, PROJECT_NAME)
         config_file = "{}.yml".format(os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME))

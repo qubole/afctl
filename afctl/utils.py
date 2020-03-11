@@ -104,7 +104,7 @@ class Utility():
         for i in range(len(dirs)+1):
             path = '/'.join(dirs[:i])
             if os.path.exists(os.path.join('/'+path, '.afctl_project')):
-                return dirs[i-1], '/'+path
+                return [dirs[i-1], '/'+path]
         return None
 
     @staticmethod

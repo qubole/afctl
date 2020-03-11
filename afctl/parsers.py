@@ -225,14 +225,17 @@ class Parser():
     def validate_project(cls):
         try:
             project_name = None
+            project_path = None
             pwd = os.getcwd()
             # If any parent of pwd contains .afctl_project. If so then it should be the project.
-            project_name, project_path = Utility.find_project(pwd)
-            if project_name is None:
+            project = Utility.find_project(pwd)
+            if project is None:
                 # Could not find .afctl_project
                 cls.parser.error(colored("{} is not an afctl project.".format(pwd), 'red'))
             else:
                 # Check is the dir containing .afctl_project has a config file
+                project_name = project[0]
+                project_path = project[1]
                 if not os.path.exists(Utility.project_config(project_name)):
                     cls.parser.error(colored("Config file does not exists for {}".format(project_name), 'red'))
 
@@ -244,7 +247,6 @@ class Parser():
     @classmethod
     def act_on_configs(cls, args, config_file):
         try:
-
             # Setting global values.
             if args.type == "global":
                 origin = args.o

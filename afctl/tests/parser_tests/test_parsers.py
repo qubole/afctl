@@ -1,7 +1,7 @@
 from afctl.parsers import Parser
 import pytest
 import os
-from afctl.tests.utils import clean_up, check_paths, PROJECT_NAME, PROJECT_CONFIG_DIR
+from afctl.tests.utils import clean_up, check_paths, PROJECT_NAME, PROJECT_CONFIG_DIR, DummyArgParse
 
 class TestParser:
 
@@ -30,3 +30,22 @@ class TestParser:
         # Negative test cases.
         assert check_paths([PROJECT_NAME], ['dummy']) is False
 
+
+    def test_configs(self, create_parser):
+        args = DummyArgParse(type="global", origin="new_origin", token="new_token", version="1.10.0")
+        Parser.act_on_configs(args, PROJECT_NAME)
+        config_file = "{}.yml".format(os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME))
+        expected_output = """global:
+    airflow_version: 1.10.0
+    git:
+        origin: new_origin
+        access-token: new_token
+deployment:
+    qubole: null
+    local:
+        compose: null
+        """
+        current_output = open(config_file).read()
+        expected_output = expected_output.replace(" ", "")
+        current_output = current_output.replace(" ", "")
+        assert expected_output == current_output

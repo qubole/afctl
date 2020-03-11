@@ -33,7 +33,6 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
             print("Updating docker compose.")
             Utility.update_config(project_name, {'deployment':{'local':{'compose': "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)}}})
 
-        # Change dags directory in volume
         except Exception as e:
             raise AfctlDeploymentException(e)
 

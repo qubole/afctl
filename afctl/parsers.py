@@ -245,7 +245,7 @@ class Parser():
 
 
     @classmethod
-    def act_on_configs(cls, args, config_file):
+    def act_on_configs(cls, args, project_name):
         try:
             # Setting global values.
             if args.type == "global":
@@ -258,13 +258,13 @@ class Parser():
                     version = input("Input airflow version : ")
 
                 if origin != '' and origin is not None:
-                    Utility.update_config(config_file, {'global':{'git':{'origin':origin}}})
+                    Utility.update_config(project_name, {'global':{'git':{'origin':origin}}})
 
                 if token != '' and token is not None:
-                    Utility.update_config(config_file, {'global':{'git':{'access-token':token}}})
+                    Utility.update_config(project_name, {'global':{'git':{'access-token':token}}})
 
                 if version != '' and version is not None:
-                    Utility.update_config(config_file, {'global': {'airflow_version': version}})
+                    Utility.update_config(project_name, {'global': {'airflow_version': version}})
 
             # If adding or updating configs.
             elif args.type == 'add' or  args.type == 'update':
@@ -277,13 +277,13 @@ class Parser():
                     cls.parser.error(colored(msg, 'red'))
                 else:
                     if args.type == 'update':
-                        Utility.update_config(config_file, configs)
+                        Utility.update_config(project_name, configs)
                     if args.type == 'add':
-                        Utility.add_configs(['deployment', args.d],config_file, configs)
+                        Utility.add_configs(['deployment', args.d], project_name, configs)
 
             # Showing configs
             elif args.type == 'show':
-                Utility.print_file(Utility.project_config(config_file))
+                Utility.print_file(Utility.project_config(project_name))
 
         except Exception as e:
             AfctlParserException(e)

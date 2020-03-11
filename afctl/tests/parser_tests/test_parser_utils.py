@@ -94,11 +94,70 @@ dag = DAG(dag_id='test', default_args=default_args, schedule_interval='@once')
     @pytest.fixture(scope='function')
     def create_config_file(self):
         subprocess.run(['mkdir', PROJECT_CONFIG_DIR])
-        subprocess.run(['touch', os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME)+'.yml'])
+        file_path = os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME)+'.yml'
+        subprocess.run(['touch', file_path])
+        yml_template = """
+parent:
+    child1:
+    child2:
+        """
+
+        with open(file_path, 'w') as file:
+            file.write(yml_template)
         yield
         clean_up(PROJECT_CONFIG_DIR)
 
-
     # add_configs update_config
     def test_add_and_update_configs(self, create_config_file):
-        pass
+        add_config = {'name': {'key1': 'val1', 'key2': 'val2'}}
+        Utility.add_configs(['parent', 'child1'], PROJECT_NAME, add_config)
+        config_file = os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME)+'.yml'
+
+        expected_output = """parent:
+    child1:
+        name:
+            key1: val1
+            key2: val2
+    child2: null
+        """
+
+        current_output = open(config_file).read()
+        expected_output = expected_output.replace(" ", "")
+        current_output = current_output.replace(" ", "")
+        assert expected_output == current_output
+
+        add_config = {'name': {'key3': 'val3', 'key4': 'val4'}}
+        Utility.add_configs(['parent', 'child2'], PROJECT_NAME, add_config)
+
+        expected_output = """parent:
+    child1:
+        name:
+            key1: val1
+            key2: val2
+    child2: 
+        name:
+            key3: val3
+            key4: val4
+        """
+        current_output = open(config_file).read()
+        expected_output = expected_output.replace(" ", "")
+        current_output = current_output.replace(" ", "")
+        assert expected_output == current_output
+
+
+        update_config = {'parent': {'child2': {'name' : {'key3': 'val100'}}}}
+        Utility.update_config(PROJECT_NAME, update_config)
+        expected_output = """parent:
+    child1:
+        name:
+            key1: val1
+            key2: val2
+    child2: 
+        name:
+            key3: val100
+            key4: val4
+        """
+        current_output = open(config_file).read()
+        expected_output = expected_output.replace(" ", "")
+        current_output = current_output.replace(" ", "")
+        assert expected_output == current_output

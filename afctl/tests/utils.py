@@ -8,11 +8,14 @@ PROJECT_CONFIG_DIR = os.path.join(os.path.expanduser("~"), '.afctl_config')
 
 class DummyArgParse:
 
-    def __init__(self, type=None, origin=None, token=None, version=None):
+    def __init__(self, type=None, origin=None, token=None, version=None, env=None, cluster=None, name=None):
         self.type = type
         self.o = origin
         self.t = token
         self.v = version
+        self.e = env
+        self.c = cluster
+        self.n = name
 
 
 def clean_up(project_file):

@@ -60,7 +60,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             else:
 
                 # Name of connection is compulsory in this flow.
-                if  args.n is None:
+                if args.n is None:
                     return config, True, "Name of deployment is required. Check usage."
 
                 if args.e is not None:
@@ -74,7 +74,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
 
                 # For adding a new connection you need to provide all the configs.
                 if args.type == 'add' and (args.e is None or args.c is None or args.t is None):
-                    return {}, True, "All flags are required to add a new config. Check usage."
+                    return {}, True, "All arguments are required to add a new config. Check usage."
 
                 if args.type == 'update':
                     return {'deployment':{'qubole':{args.n:config}}}, False, ""
@@ -119,7 +119,7 @@ class QuboleDeploymentConfig(BaseDeploymentConfig):
             if token is not None and token != "":
                 origin = QuboleUtils.create_private_repo_url(origin, token)
 
-            qds_command = QuboleUtils.get_git_command(project, origin, params['branch'], latest_commit_on_remote)
+            qds_command = QuboleUtils.get_shell_command(project, origin, params['branch'], latest_commit_on_remote)
             command = QuboleUtils.run_qds_command(params['env'], params['cluster'], params['token'], qds_command)
             if command.status != 'done':
                 return True, "Deployment failed on Qubole"

@@ -2,13 +2,12 @@ from afctl.utils import Utility
 import os
 import subprocess
 from termcolor import colored
-from afctl.plugins.deployments.deployment_config import DeploymentConfig
 from afctl.exceptions import AfctlParserException
 
 class ParserHelpers():
 
     @staticmethod
-    def init_file_name(name):
+    def get_project_file_names(name):
         try:
             pwd = os.getcwd()
             main_dir = pwd if name == '.' else os.path.join(pwd, name.lstrip('/').rstrip('/'))
@@ -52,7 +51,7 @@ class ParserHelpers():
 
 
     @staticmethod
-    def init_files(files):
+    def generate_project_files(files):
         try:
             sub_file = Utility.create_files([files['main_dir']], files['sub_files'])
             dirs = Utility.create_dirs([files['main_dir']], files['sub_dirs'])
@@ -64,10 +63,10 @@ class ParserHelpers():
 
 
     @staticmethod
-    def init_project(files):
+    def generate_all(files):
         try:
             # STEP - 1: create files and dirs
-            sub_file, dirs, project_dirs = ParserHelpers.init_files(files)
+            sub_file, dirs, project_dirs = ParserHelpers.generate_project_files(files)
 
             #STEP - 2: create config file
             ParserHelpers.generate_config_file(files)
@@ -85,7 +84,6 @@ class ParserHelpers():
             subprocess.run(['cp', '{}/plugins/deployments/deployment_config.yml'.format(os.path.dirname(os.path.abspath(__file__))),
                             files['config_file']])
 
-            DeploymentConfig.generate_dirs(files['main_dir'], files['project_name'])
             ParserHelpers.add_git_config(files)
 
         except Exception as e:
@@ -99,16 +97,16 @@ class ParserHelpers():
             if args.name != '.':
                 if not os.path.exists(files['main_dir']):
                     os.mkdir(files['main_dir'])
-                    ParserHelpers.init_project(files)
+                    ParserHelpers.generate_all(files)
                 else:
                     print("Directory already exists.")
                     return True
             else:
                 # Initialising project in existing directory
-                project_parent_dir = Utility.is_afctl_project(os.getcwd())
+                project_parent_dir = Utility.find_project(os.getcwd())
                 if project_parent_dir is None:
                     # Not an afctl project. Generate all directories.
-                    ParserHelpers.init_project(files)
+                    ParserHelpers.generate_all(files)
                 else:
                     # Since its an afctl project. Just populate the config files.
                     ParserHelpers.generate_config_file(files)

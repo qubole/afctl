@@ -7,4 +7,5 @@ steps:
 - name: runtests
   image: python:3
   commands:
-    - echo "Executed"
+    - pip install -r requirements.txt
+    - pytest

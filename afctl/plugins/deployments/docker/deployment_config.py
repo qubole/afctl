@@ -26,13 +26,13 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
     def generate_dirs(cls, main_dir, project_name):
         try:
             compose_file = docker_compose_template(project_name)
+
             deployment_compose_file = "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)
             with open(deployment_compose_file, 'w') as file:
                 file.write(compose_file)
             print("Updating docker compose.")
             Utility.update_config(project_name, {'deployment':{'local':{'compose': "{}/deployments/{}-docker-compose.yml".format(main_dir, project_name)}}})
 
-        # Change dags directory in volume
         except Exception as e:
             raise AfctlDeploymentException(e)
 

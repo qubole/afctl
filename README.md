@@ -1,6 +1,6 @@
 # afctl
 
-The proposed CLI tool is authored to make creating and deployment of airflow projects faster and smoother. 
+The proposed CLI tool is authored to make creating and deployment of Apache Airflow (https://airflow.apache.org/) projects faster and smoother. 
 As of now, there is no tool out there that can empower the user to create a boilerplate code structure for airflow 
 projects and make development + deployment of projects seamless.
 

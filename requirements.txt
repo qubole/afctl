@@ -1,4 +1,4 @@
-pyyaml==5.2
+pyyaml==5.4
 versioneer==0.18
 mako==1.1.0
 qds-sdk==1.13.2

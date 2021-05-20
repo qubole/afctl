@@ -1,13 +1,17 @@
 from afctl.utils import Utility
 import pytest
-import os, subprocess
+import os, pathlib, shutil, tempfile
 from afctl.tests.utils import create_path_and_clean, PROJECT_NAME, PROJECT_CONFIG_DIR, clean_up
+
+SEP = os.path.sep
+TMP = tempfile.gettempdir()
+TMP_NO_SEP = TMP.replace(SEP,'')
 
 class TestUtils:
 
     @pytest.fixture(scope='function')
     def clean_tmp_dir(self):
-        parent = ['/tmp']
+        parent = [TMP]
         child = ['one', 'two', 'three']
         create_path_and_clean(parent, child)
         yield
@@ -15,26 +19,26 @@ class TestUtils:
 
     # create_dirs
     def test_create_dir(self, clean_tmp_dir):
-        parent = ['/tmp']
+        parent = [TMP]
         child = ['one', 'two', 'three']
         dirs = Utility.create_dirs(parent, child)
-        assert dirs['one'] == '/tmp/one'
-        assert os.path.exists(dirs['one']) is True
-        assert dirs['two'] == '/tmp/two'
-        assert os.path.exists(dirs['two']) is True
-        assert dirs['three'] == '/tmp/three'
-        assert os.path.exists(dirs['three']) is True
+        assert dirs['one'] == SEP.join([TMP, 'one'])
+        assert os.path.isdir(dirs['one'])
+        assert dirs['two'] == SEP.join([TMP, 'two'])
+        assert os.path.isdir(dirs['two'])
+        assert dirs['three'] == SEP.join([TMP, 'three'])
+        assert os.path.isdir(dirs['three'])
 
     # create_files
     def test_create_files(self, clean_tmp_dir):
-        parent = ['/tmp']
+        parent = [TMP]
         child = ['one', 'two', 'three']
         dirs = Utility.create_files(parent, child)
-        assert dirs['one'] == '/tmp/one'
+        assert dirs['one'] == SEP.join([TMP, 'one'])
         assert os.path.exists(dirs['one']) is True
-        assert dirs['two'] == '/tmp/two'
+        assert dirs['two'] == SEP.join([TMP, 'two'])
         assert os.path.exists(dirs['two']) is True
-        assert dirs['three'] == '/tmp/three'
+        assert dirs['three'] == SEP.join([TMP, 'three'])
         assert os.path.exists(dirs['three']) is True
 
     # project_config
@@ -47,7 +51,7 @@ class TestUtils:
     # generate_dag_template
     def test_generate_dag_template(self):
         project_name = "tes_project"
-        path = "/tmp"
+        path = TMP
         dag = "test"
         Utility.generate_dag_template(project_name, dag, path)
         expected_output = """ 
@@ -56,8 +60,8 @@ from datetime import datetime, timedelta
 
 default_args = {
 'owner': 'tes_project',
+'start_date': datetime.now() - timedelta(days=1),
 # 'depends_on_past': ,
-# 'start_date': ,
 # 'email': ,
 # 'email_on_failure': ,
 # 'email_on_retry': ,
@@ -76,26 +80,26 @@ dag = DAG(dag_id='test', default_args=default_args, schedule_interval='@once')
 
     @pytest.fixture(scope='function')
     def create_project(self):
-        path = '/tmp/one/two/three'
-        subprocess.run(['mkdir', '-p', path])
-        file_path = '/tmp/one/two/.afctl_project'
-        subprocess.run(['touch', file_path])
+        path = os.path.sep.join([TMP, 'one', 'two', 'three'])
+        os.makedirs(path, exist_ok=True)
+        file_path = os.path.sep.join([TMP, 'one', 'two', '.afctl_project'])
+        pathlib.Path(file_path).touch()
         yield
-        subprocess.run(['rm', '-rf', path])
+        shutil.rmtree(path)
 
     # find_project
     def test_find_project(self, create_project):
-        path = '/tmp/one/two/three'
+        path = os.path.sep.join([TMP, 'one', 'two', 'three'])
         project = Utility.find_project(path)
         assert project[0] == 'two'
-        assert project[1] == '/tmp/one/two'
+        assert project[1] == os.path.sep.join([TMP, 'one', 'two'])
 
 
     @pytest.fixture(scope='function')
     def create_config_file(self):
-        subprocess.run(['mkdir', PROJECT_CONFIG_DIR])
+        os.mkdir(PROJECT_CONFIG_DIR)
         file_path = os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME)+'.yml'
-        subprocess.run(['touch', file_path])
+        pathlib.Path(file_path).touch()
         yml_template = """
 parent:
     child1:

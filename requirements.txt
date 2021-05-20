@@ -4,3 +4,5 @@ mako==1.1.0
 qds-sdk==1.13.2
 termcolor
 pytest
+gitpython
+docker

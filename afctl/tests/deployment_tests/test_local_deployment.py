@@ -1,7 +1,9 @@
 from afctl.plugins.deployments.docker.deployment_config import DockerDeploymentConfig
 from afctl.tests.utils import clean_up, PROJECT_NAME, PROJECT_CONFIG_DIR
 import pytest
-import os, subprocess
+import os, pathlib, tempfile
+
+TMP = tempfile.gettempdir()
 
 
 class TestLocalDeployment:
@@ -10,12 +12,12 @@ class TestLocalDeployment:
     def create_project(self):
         clean_up(PROJECT_NAME)
         clean_up(PROJECT_CONFIG_DIR)
-        main_dir = os.path.join('/tmp', PROJECT_NAME)
-        subprocess.run(['mkdir', main_dir])
-        subprocess.run(['mkdir', PROJECT_CONFIG_DIR])
-        subprocess.run(['mkdir', os.path.join(main_dir, 'deployments')])
+        main_dir = os.path.join(TMP, PROJECT_NAME)
+        os.makedirs(main_dir, exist_ok=True)
+        os.makedirs(PROJECT_CONFIG_DIR, exist_ok=True)
+        os.makedirs(os.path.join(main_dir, 'deployments'), exist_ok=True)
         config_file = "{}.yml".format(os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME))
-        subprocess.run(['touch', config_file])
+        pathlib.Path(config_file).touch()
         config_file_content = """
 global:
     airflow_version:

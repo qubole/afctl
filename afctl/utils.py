@@ -1,10 +1,12 @@
 import os
 import itertools
-import subprocess
+import pathlib
 import yaml
 from afctl.exceptions import AfctlUtilsException
 from afctl.templates.dag_template import dag_template
 from termcolor import colored
+
+SEP = os.path.sep
 
 class Utility():
 
@@ -17,11 +19,12 @@ class Utility():
         try:
             dirs = {}
             for dir1, dir2 in itertools.product(parent, child):
-                if not os.path.exists(os.path.join(dir1, dir2)):
-                    os.mkdir(os.path.join(dir1, dir2))
+                target = os.path.join(dir1, dir2)
+                if not os.path.exists(target):
+                    os.makedirs(target)
                 else:
                     print("{} already exists. Skipping.".format(dir2))
-                dirs[dir2] = os.path.join(dir1, dir2)
+                dirs[dir2] = target
             return dirs
         except Exception as e:
             raise AfctlUtilsException(e)
@@ -33,7 +36,7 @@ class Utility():
             files = {}
             for dir1, dir2 in itertools.product(parent, child):
                 if not os.path.exists(os.path.join(dir1, dir2)):
-                    subprocess.run(['touch', os.path.join(dir1, dir2)])
+                    pathlib.Path(os.path.join(dir1, dir2)).touch()
                 else:
                     print("{} already exists. Skipping.".format(dir2))
                 files[dir2] = os.path.join(dir1, dir2)
@@ -65,7 +68,11 @@ class Utility():
 
     @staticmethod
     def print_file(file):
-        subprocess.call(['cat', file])
+        try:
+            with open(file) as fh:
+                print(fh.read())
+        finally:
+            fh.close()
 
     @staticmethod
     def update_config(file, config):
@@ -100,11 +107,11 @@ class Utility():
 
     @staticmethod
     def find_project(pwd):
-        dirs = pwd.lstrip('/').split('/')
-        for i in range(len(dirs)+1):
-            path = '/'.join(dirs[:i])
-            if os.path.exists(os.path.join('/'+path, '.afctl_project')):
-                return [dirs[i-1], '/'+path]
+        dirs = pwd.split(SEP)
+        for i in range(len(dirs), 0, -1):
+            path = SEP.join(dirs[:i])
+            if os.path.exists(os.path.join(path, '.afctl_project')):
+                return [dirs[i-1], path]
         return None
 
     @staticmethod

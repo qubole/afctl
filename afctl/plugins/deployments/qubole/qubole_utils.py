@@ -1,25 +1,17 @@
-import subprocess
 from afctl.exceptions import AfctlDeploymentException
 from mako.template import Template
 from qds_sdk.qubole import Qubole
 from qds_sdk.commands import ShellCommand
 from urllib.parse import urlparse
-
+import git
 
 class QuboleUtils():
 
     @staticmethod
     def fetch_latest_commit(origin, branch):
         try:
-            commit = subprocess.run(['git', 'ls-remote', origin, 'refs/heads/{}'.format(branch), '|', 'cut', '-f', '1'],
-                                    stdout=subprocess.PIPE)
-            commit = commit.stdout.decode('utf-8')
-
-            if commit == '':
-                return None
-
-            return commit.split('\t')[0]
-
+            repo = git.Repo('.')
+            return repo.remotes.origin.refs[0].commit.hexsha
         except Exception as e:
             raise AfctlDeploymentException(e)
 
@@ -95,9 +87,8 @@ sudo monit restart scheduler"""
             env = "{}/api".format(config['env'].rstrip('/'))
             cluster = config['cluster']
             token = config['token']
-            branch = subprocess.run(['git', 'symbolic-ref', '--short', 'HEAD'], stdout=subprocess.PIPE).stdout.decode(
-                'utf-8')[:-1]
-
+            repo = git.Repo('.')
+            branch = repo.active_branch.name
             return {
                 'name': name,
                 'env': env,

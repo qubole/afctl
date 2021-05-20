@@ -5,7 +5,6 @@ import os
 from afctl import __version__
 from afctl.utils import Utility
 from afctl.exceptions import AfctlParserException
-import subprocess
 from afctl.plugins.deployments.deployment_config import DeploymentConfig
 from afctl.parser_helpers import ParserHelpers
 from termcolor import colored
@@ -123,9 +122,10 @@ class Parser():
             elif args.type == "module":
                 path = "{}/{}/dags/{}".format(project_path, project_name, args.n)
                 test_path = "{}/tests/{}".format(project_path, args.n)
-                mod_val = subprocess.call(['mkdir', path])
-                test_val = subprocess.call(['mkdir', test_path])
-                if mod_val != 0 or test_val != 0:
+                try:
+                    os.makedirs(path, exist_ok=True)
+                    os.makedirs(test_path, exist_ok=True)
+                except:
                     cls.parser.error(colored("Unable to generate.", 'red'))
 
             print(colored("Generated successfully.", 'green'))

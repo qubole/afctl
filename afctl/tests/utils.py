@@ -1,5 +1,5 @@
 import os
-import subprocess
+import shutil
 import itertools
 
 PROJECT_NAME = 'test_project'
@@ -20,7 +20,10 @@ class DummyArgParse:
 
 def clean_up(project_file):
     if os.path.exists(project_file):
-        subprocess.run(['rm', '-rf', project_file])
+        if os.path.isdir(project_file):
+            shutil.rmtree(project_file, ignore_errors=True)
+        else:
+            os.unlink(project_file)
 
 
 def check_paths(parent, child):

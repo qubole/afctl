@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 
 default_args = {
 'owner': '${config_name}',
+'start_date': datetime.now() - timedelta(days=1),
 # 'depends_on_past': ,
-# 'start_date': ,
 # 'email': ,
 # 'email_on_failure': ,
 # 'email_on_retry': ,

@@ -7,4 +7,5 @@ hooks:
 deployment:
   qubole
   local
+  remote
 

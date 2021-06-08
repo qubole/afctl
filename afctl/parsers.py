@@ -43,7 +43,7 @@ class Parser():
                 os.mkdir(files['config_dir'])
 
             if os.path.exists(files['main_dir']) and os.path.exists(files['config_file']):
-                cls.parser.error(colored("Project already exists. Please delete entry under /home/.afctl_congfis", 'red'))
+                cls.parser.error(colored("Project already exists. Please delete entry under ~/.afctl_config", 'red'))
 
             print(colored("Initializing new project...", 'green'))
 
@@ -178,13 +178,16 @@ class Parser():
                         ,
                 'args': [
                     ['type', {'choices':['add', 'update', 'show', 'global']}],
-                    ['-d', {'choices': ['qubole']}],
+                    ['-d', {'choices': ['qubole', 'remote']}],
+                    ['-m'],
+                    ['-i'],
                     ['-o'],
                     ['-p'],
                     ['-n'],
                     ['-e'],
                     ['-c'],
                     ['-t'],
+                    ['-u'],
                     ['-v']
                 ]
 
@@ -286,4 +289,4 @@ class Parser():
                 Utility.print_file(Utility.project_config(project_name))
 
         except Exception as e:
-            AfctlParserException(e)
+            raise AfctlParserException(e)

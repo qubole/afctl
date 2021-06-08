@@ -1,10 +1,14 @@
 import os
 import shutil
 import itertools
+import tempfile
 
 PROJECT_NAME = 'test_project'
-PROJECT_CONFIG_DIR = os.path.join(os.path.expanduser("~"), '.afctl_config')
+PROJECT_CONFIG_DIR=os.path.join(tempfile.gettempdir(), PROJECT_NAME, '.afctl_config')
 
+# monkey patch for testing (otherwise test suite zaps your .afctl_config!!
+from afctl.utils import Utility
+Utility.CONSTS['config_dir'] = PROJECT_CONFIG_DIR
 
 class DummyArgParse:
 

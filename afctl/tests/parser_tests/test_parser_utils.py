@@ -41,7 +41,7 @@ class TestUtils:
         assert dirs['three'] == SEP.join([TMP, 'three'])
         assert os.path.exists(dirs['three']) is True
 
-    # project_config
+    # project config dir
     def test_return_project_config_file(self):
         project = "test_project"
         expected_path = os.path.join(PROJECT_CONFIG_DIR, project)+".yml"
@@ -97,7 +97,7 @@ dag = DAG(dag_id='test', default_args=default_args, schedule_interval='@once')
 
     @pytest.fixture(scope='function')
     def create_config_file(self):
-        os.mkdir(PROJECT_CONFIG_DIR)
+        os.makedirs(PROJECT_CONFIG_DIR, exist_ok=True)
         file_path = os.path.join(PROJECT_CONFIG_DIR, PROJECT_NAME)+'.yml'
         pathlib.Path(file_path).touch()
         yml_template = """

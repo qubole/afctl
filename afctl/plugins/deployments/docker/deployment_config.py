@@ -4,7 +4,7 @@ from afctl.plugins.deployments.docker.afctl_docker_compose import docker_compose
 import os
 import yaml
 from afctl.utils import Utility
-import subprocess
+import docker
 
 # Yaml Structure
 #   deployment:
@@ -47,8 +47,10 @@ class DockerDeploymentConfig(BaseDeploymentConfig):
             with open(Utility.project_config(config_file)) as file:
                 config = yaml.full_load(file)
 
-            val = subprocess.call(['docker', 'info'])
-            if val != 0:
+            try:
+                client = docker.from_env()
+                client.info()
+            except:
                 return True, "Docker is not running. Please start docker."
 
             if args.d:

@@ -46,6 +46,7 @@ deployment:
     qubole: null
     local:
         compose: null
+    remote: null
         """
         current_output = open(config_file).read()
         expected_output = expected_output.replace(" ", "")

@@ -7,3 +7,4 @@ deployment:
   qubole:
   local:
     compose:
+  remote:

@@ -1,8 +1,11 @@
 from afctl.utils import Utility
 import os
-import subprocess
+import shutil
 from termcolor import colored
 from afctl.exceptions import AfctlParserException
+import git
+
+SEP = os.path.sep
 
 class ParserHelpers():
 
@@ -10,7 +13,7 @@ class ParserHelpers():
     def get_project_file_names(name):
         try:
             pwd = os.getcwd()
-            main_dir = pwd if name == '.' else os.path.join(pwd, name.lstrip('/').rstrip('/'))
+            main_dir = pwd if name == '.' else os.path.join(pwd, name.lstrip(SEP).rstrip(SEP))
             project_name = os.path.basename(main_dir)
             config_dir = Utility.CONSTS['config_dir']
             config_file = Utility.project_config(project_name)
@@ -35,11 +38,10 @@ class ParserHelpers():
     @staticmethod
     def add_git_config(files):
         try:
-            origin = subprocess.run(['git', '--git-dir={}'.format(os.path.join(files['main_dir'], '.git')), 'config',
-                                     '--get', 'remote.origin.url'],stdout=subprocess.PIPE)
-            origin = origin.stdout.decode('utf-8')[:-1]
-            if origin == '':
-                subprocess.run(['git', 'init', files['main_dir']])
+            try:
+                origin = git.Repo(os.path.join(files['main_dir']))
+            except git.exc.InvalidGitRepositoryError:
+                origin = git.Repo.init(os.path.join(files['main_dir']))
                 print(colored("Git origin is not set for this repository. Run 'afctl config global -o <origin>'", 'yellow'))
             else:
                 print("Updating git origin.")
@@ -71,9 +73,8 @@ class ParserHelpers():
             #STEP - 2: create config file
             ParserHelpers.generate_config_file(files)
 
-            subprocess.run(['cp', '{}/templates/gitignore.txt'.format(os.path.dirname(os.path.abspath(__file__))),
-                            sub_file['.gitignore']])
-
+            shutil.copyfile('{}/templates/gitignore.txt'.format(os.path.dirname(os.path.abspath(__file__))),
+                            sub_file['.gitignore'])
         except Exception as e:
             raise AfctlParserException(e)
 
@@ -81,9 +82,8 @@ class ParserHelpers():
     @staticmethod
     def generate_config_file(files):
         try:
-            subprocess.run(['cp', '{}/plugins/deployments/deployment_config.yml'.format(os.path.dirname(os.path.abspath(__file__))),
-                            files['config_file']])
-
+            shutil.copyfile('{}/plugins/deployments/deployment_config.yml'.format(os.path.dirname(os.path.abspath(__file__))),
+                            files['config_file'])
             ParserHelpers.add_git_config(files)
 
         except Exception as e:

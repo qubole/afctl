@@ -1,10 +1,14 @@
 import os
-import subprocess
+import shutil
 import itertools
+import tempfile
 
 PROJECT_NAME = 'test_project'
-PROJECT_CONFIG_DIR = os.path.join(os.path.expanduser("~"), '.afctl_config')
+PROJECT_CONFIG_DIR=os.path.join(tempfile.gettempdir(), PROJECT_NAME, '.afctl_config')
 
+# monkey patch for testing (otherwise test suite zaps your .afctl_config!!
+from afctl.utils import Utility
+Utility.CONSTS['config_dir'] = PROJECT_CONFIG_DIR
 
 class DummyArgParse:
 
@@ -20,7 +24,10 @@ class DummyArgParse:
 
 def clean_up(project_file):
     if os.path.exists(project_file):
-        subprocess.run(['rm', '-rf', project_file])
+        if os.path.isdir(project_file):
+            shutil.rmtree(project_file, ignore_errors=True)
+        else:
+            os.unlink(project_file)
 
 
 def check_paths(parent, child):

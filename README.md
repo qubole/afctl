@@ -180,6 +180,34 @@ afctl config add -d qubole -n demo -e https://api.qubole.com -c airflow_1102 -t 
 afctl deploy qubole -n <name>
 ```
 
+### 7. Deploy project to a remote Airflow
+
+You can deploy your DAG's directly to a remote Airflow instance using SCP.  Your login must have
+enough permissions to write to the DAG folder; but since we don't know the installation, it isn't
+possible to manage any Python requirements using this deployer.
+
+In order to configure remote deployment, you must pass host and dag directory; you may set the
+login account, and either a password or identity file.
+
+```bash
+afctl config add -d remote -m airflow.example.com -d /var/lib/airflow/dags -e mypassword
+```
+or (say)
+
+```bash
+afctl config add -d remote -m airflow.example.com -d /var/lib/airflow/dags -u airflow -i ~/.ssh/id_rsa-airflow
+```
+
+This command will modify your config file. You can see your config file with the following command :
+```bash
+afctl config show
+
+* To deploy run the following command
+```bash
+afctl deploy remote
+```
+
+
 ### The following video also contains all the steps of deploying project using afctl - </br>
 https://www.youtube.com/watch?v=A4rcZDGtJME&feature=youtu.be
 
@@ -194,8 +222,9 @@ global:
 --access-token:
 deployment:
 -qubole:
---local:
----compose:
+-local:
+--compose:
+-remote:
 ```
 <br>
 
@@ -225,8 +254,6 @@ afctl <command> -h
 ```
 <br>
 
-### Caution
-Not yet ported for Windows.
 
 #### Credits
 Docker-compose file : https://github.com/puckel/docker-airflow 

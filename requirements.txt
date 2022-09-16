@@ -1,6 +1,6 @@
 pyyaml==5.2
 versioneer==0.18
-mako==1.1.0
+mako==1.2.2
 qds-sdk==1.13.2
 termcolor
 pytest
